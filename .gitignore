@@ -1,0 +1,12 @@
+*.exe
+*.out
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+
+ros2_dds_simulator
+test_simulator

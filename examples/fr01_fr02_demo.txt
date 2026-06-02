@@ -1,0 +1,6 @@
+1
+lidar_node
+2
+/scan
+7
+0
