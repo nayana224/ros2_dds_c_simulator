@@ -1,0 +1,14 @@
+1
+lidar_node
+2
+/scan
+3
+lidar_node
+/scan
+1
+nav_node
+4
+nav_node
+/scan
+7
+0

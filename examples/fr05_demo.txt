@@ -1,0 +1,14 @@
+1
+lidar_node
+2
+/scan
+3
+lidar_node
+/scan
+5
+lidar_node
+/scan
+range data
+5
+7
+0

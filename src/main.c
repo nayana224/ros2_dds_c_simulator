@@ -38,9 +38,9 @@ static void print_menu(void) {
     printf("\n=== ROS2 Pub/Sub C Simulator ===\n");
     printf("1. Add Node\n");
     printf("2. Add Topic\n");
-    printf("3. Add Publisher (not implemented)\n");
-    printf("4. Add Subscriber (not implemented)\n");
-    printf("5. Publish Message (not implemented)\n");
+    printf("3. Add Publisher\n");
+    printf("4. Add Subscriber\n");
+    printf("5. Publish Message\n");
     printf("6. Receive Message (not implemented)\n");
     printf("7. Print Registered Lists\n");
     printf("8. Print Communication Graph (not implemented)\n");
@@ -103,6 +103,62 @@ static void handle_add_topic(Simulator *sim) {
     }
 }
 
+static void handle_add_publisher(Simulator *sim) {
+    char node_name[SIM_NAME_LENGTH];
+    char topic_name[SIM_NAME_LENGTH];
+
+    printf("Enter node name: ");
+    read_name_input(node_name, sizeof(node_name));
+    printf("Enter topic name: ");
+    read_name_input(topic_name, sizeof(topic_name));
+
+    if (simulator_add_publisher(sim, node_name, topic_name)) {
+        printf("Publisher '%s' -> '%s' registered successfully.\n", node_name, topic_name);
+    } else {
+        printf("Failed to register publisher. Check node/topic existence or duplicate link.\n");
+    }
+}
+
+static void handle_add_subscriber(Simulator *sim) {
+    char node_name[SIM_NAME_LENGTH];
+    char topic_name[SIM_NAME_LENGTH];
+
+    printf("Enter node name: ");
+    read_name_input(node_name, sizeof(node_name));
+    printf("Enter topic name: ");
+    read_name_input(topic_name, sizeof(topic_name));
+
+    if (simulator_add_subscriber(sim, node_name, topic_name)) {
+        printf("Subscriber '%s' -> '%s' registered successfully.\n", node_name, topic_name);
+    } else {
+        printf("Failed to register subscriber. Check node/topic existence or duplicate link.\n");
+    }
+}
+
+static void handle_publish_message(Simulator *sim) {
+    char node_name[SIM_NAME_LENGTH];
+    char topic_name[SIM_NAME_LENGTH];
+    char message[SIM_NAME_LENGTH];
+    int priority;
+
+    printf("Enter node name: ");
+    read_name_input(node_name, sizeof(node_name));
+    printf("Enter topic name: ");
+    read_name_input(topic_name, sizeof(topic_name));
+    printf("Enter message: ");
+    read_name_input(message, sizeof(message));
+    printf("Enter priority: ");
+    if (scanf("%d", &priority) != 1) {
+        printf("Failed to publish message. Invalid priority.\n");
+        return;
+    }
+    getchar();
+
+    if (!simulator_publish_message(sim, node_name, topic_name, message, priority)) {
+        printf("Failed to publish message. Check node/topic/publisher existence or empty message.\n");
+    }
+}
+
 
 /**
  * @brief 프로그램의 시작점.
@@ -139,15 +195,21 @@ int main(void) {
             case 2:
                 handle_add_topic(&sim);
                 break;
+            case 3:
+                handle_add_publisher(&sim);
+                break;
+            case 4:
+                handle_add_subscriber(&sim);
+                break;
+            case 5:
+                handle_publish_message(&sim);
+                break;
             case 7:
                 simulator_print_registered_lists(&sim);
                 break;
             case 0:
                 simulator_destroy(&sim);
                 return 0;
-            case 3:
-            case 4:
-            case 5:
             case 6:
             case 8:
             case 9:

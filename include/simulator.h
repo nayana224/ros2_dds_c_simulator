@@ -26,8 +26,26 @@ typedef struct Node {
  */
 typedef struct Topic {
     char name[SIM_NAME_LENGTH];
+    struct Publisher *publishers;
+    struct Subscriber *subscribers;
     struct Topic *next;
 } Topic;
+
+/**
+ * @brief ROS2 Publisher를 표현하는 연결 리스트 노드
+ */
+typedef struct Publisher {
+    char node_name[SIM_NAME_LENGTH];
+    struct Publisher *next;
+} Publisher;
+
+/**
+ * @brief ROS2 Subscriber를 표현하는 연결 리스트 노드
+ */
+typedef struct Subscriber {
+    char node_name[SIM_NAME_LENGTH];
+    struct Subscriber *next;
+} Subscriber;
 
 
 /**
@@ -40,6 +58,9 @@ typedef struct Simulator {
     Node *nodes; // Node's head pointer
     Topic *topics; // Topic's head pointer
 } Simulator;
+
+
+
 
 
 /**
@@ -113,5 +134,12 @@ void simulator_print_topics(const Simulator *sim);
  * @param sim Simulator 포인터
  */
 void simulator_print_registered_lists(const Simulator *sim);
+
+
+int simulator_add_publisher(Simulator *sim, const char *node_name, const char *topic_name);
+int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *topic_name);
+int simulator_publish_message(Simulator *sim, const char *node_name, const char *topic_name, const char *message, int priority);
+Publisher *simulator_find_publisher(const Topic *topic, const char *node_name);
+Subscriber *simulator_find_subscriber(const Topic *topic, const char *node_name);
 
 #endif
