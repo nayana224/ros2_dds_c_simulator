@@ -56,7 +56,7 @@ static void print_menu(void)
     printf("5. Publish Message\n");
     printf("6. Receive Message\n");
     printf("7. Print Registered Lists\n");
-    printf("8. Print Communication Graph (not implemented)\n");
+    printf("8. Print Communication Graph\n");
     printf("9. Search Path Between Nodes (not implemented)\n");
     printf("0. Exit\n");
     printf("Select: ");
@@ -265,9 +265,11 @@ void cli_run(Simulator *sim)
             case 7:
                 simulator_print_registered_lists(sim);
                 break;
+            case 8:
+                simulator_print_communication_graph(sim);
+                break;
             case 0:
                 return;
-            case 8:
             case 9:
                 printf("This feature is intentionally not implemented in this step.\n");
                 break;

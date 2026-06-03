@@ -823,3 +823,53 @@ void simulator_print_registered_lists(const Simulator *sim) {
     simulator_print_nodes(sim);
     simulator_print_topics(sim);
 }
+
+/**
+ * @brief 등록된 publish/subscribe 관계를 그래프 간선 목록으로 출력한다.
+ *
+ * Topic 연결 리스트를 순회하면서 각 Topic의 Publisher 목록과 Subscriber 목록을
+ * 각각 그래프의 방향 간선으로 표현한다.
+ *
+ * 출력 형식:
+ * - Publisher Node -> Topic
+ * - Topic -> Subscriber Node
+ *
+ * @param sim Simulator 포인터
+ *
+ * @note 시간복잡도는 O(T + P_total + S_total)이다.
+ */
+void simulator_print_communication_graph(const Simulator *sim)
+{
+    const Topic *topic;
+    int edge_count = 0;
+
+    printf("Communication graph:\n");
+    if (sim == NULL || sim->topics == NULL) {
+        printf("  (empty)\n");
+        return;
+    }
+
+    topic = sim->topics;
+    while (topic != NULL) {
+        const Publisher *publisher = topic->publishers;
+        const Subscriber *subscriber = topic->subscribers;
+
+        while (publisher != NULL) {
+            printf("  %s -> %s\n", publisher->node_name, topic->name);
+            edge_count++;
+            publisher = publisher->next;
+        }
+
+        while (subscriber != NULL) {
+            printf("  %s -> %s\n", topic->name, subscriber->node_name);
+            edge_count++;
+            subscriber = subscriber->next;
+        }
+
+        topic = topic->next;
+    }
+
+    if (edge_count == 0) {
+        printf("  (empty)\n");
+    }
+}

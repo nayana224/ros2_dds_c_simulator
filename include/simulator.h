@@ -181,6 +181,16 @@ void simulator_print_topics(const Simulator *sim);
 void simulator_print_registered_lists(const Simulator *sim);
 
 /**
+ * @brief 등록된 publish/subscribe 관계를 Communication Graph 형태로 출력한다.
+ *
+ * 각 Topic을 기준으로 Publisher Node에서 Topic으로 향하는 간선과,
+ * Topic에서 Subscriber Node로 향하는 간선을 출력한다.
+ *
+ * @param sim Simulator 포인터
+ */
+void simulator_print_communication_graph(const Simulator *sim);
+
+/**
  * @brief 특정 Node를 특정 Topic의 Publisher로 등록한다.
  *
  * Node와 Topic은 모두 이미 Simulator에 등록되어 있어야 한다.

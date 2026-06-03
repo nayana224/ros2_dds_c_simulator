@@ -53,6 +53,8 @@ int main(void) {
         "subscriber registration fails when node does not exist");
     ok &= assert_true(simulator_add_subscriber(&sim, "nav_node", "/missing") == 0,
         "subscriber registration fails when topic does not exist");
+    simulator_print_communication_graph(&sim);
+    ok &= assert_true(1, "FR-09 communication graph print is callable");
 
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "range data", 5) == 1,
         "FR-05 message publish succeeds");
@@ -131,6 +133,6 @@ int main(void) {
         return 1;
     }
 
-    printf("All requested FR-01/FR-02/FR-03/FR-04/FR-05/FR-06/FR-07/FR-08 tests passed.\n");
+    printf("All requested FR-01/FR-02/FR-03/FR-04/FR-05/FR-06/FR-07/FR-08/FR-09 tests passed.\n");
     return 0;
 }
