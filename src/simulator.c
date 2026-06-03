@@ -607,6 +607,47 @@ Message *simulator_dequeue_message(Topic *topic)
 }
 
 /**
+ * @brief Subscriber Node가 Topic의 Message Queue에서 Message를 수신한다.
+ *
+ * 수신 전에 Node와 Topic이 등록되어 있는지 확인하고,
+ * 해당 Node가 Topic의 Subscriber 목록에 있는지 연결 리스트를 탐색한다.
+ * 모든 조건을 만족하면 simulator_dequeue_message()를 사용해
+ * FIFO Queue의 front Message를 꺼내 반환한다.
+ *
+ * @param sim        Simulator 포인터
+ * @param node_name  Message를 수신할 Subscriber Node 이름
+ * @param topic_name Message를 수신할 Topic 이름
+ * @return 수신한 Message 포인터, 실패하거나 Queue가 비어 있으면 NULL
+ *
+ * @note 시간복잡도는 O(N + T + S)이다.
+ *       Node 검색 O(N), Topic 검색 O(T), Subscriber 검색 O(S),
+ *       Queue dequeue 자체는 O(1)이다.
+ */
+Message *simulator_receive_message(Simulator *sim, const char *node_name, const char *topic_name)
+{
+    Topic *topic;
+
+    if (sim == NULL || !is_valid_name(node_name) || !is_valid_name(topic_name)) {
+        return NULL;
+    }
+
+    if (simulator_find_node(sim, node_name) == NULL) {
+        return NULL;
+    }
+
+    topic = simulator_find_topic(sim, topic_name);
+    if (topic == NULL) {
+        return NULL;
+    }
+
+    if (find_subscriber_in_topic(topic, node_name) == NULL) {
+        return NULL;
+    }
+
+    return simulator_dequeue_message(topic);
+}
+
+/**
  * @brief 특정 Publisher Node가 Topic에 메시지를 발행하고 Topic 내부 Queue에 저장한다.
  *
  * 발행이 성공하려면 다음 조건을 만족해야 한다.
@@ -672,11 +713,6 @@ int simulator_publish_message(Simulator *sim, const char *node_name, const char 
         topic->message_tail = new_message;
     }
 
-    printf("Message published:\n");
-    printf("Topic: %s\n", topic_name);
-    printf("Publisher: %s\n", node_name);
-    printf("Data: %s\n", message);
-    printf("Priority: %d\n", priority);
     return 1;
 }
 

@@ -226,6 +226,22 @@ int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *
 int simulator_publish_message(Simulator *sim, const char *node_name, const char *topic_name, const char *message, int priority);
 
 /**
+ * @brief Subscriber Node가 구독 중인 Topic에서 Message를 수신한다.
+ *
+ * node_name에 해당하는 Node가 topic_name Topic의 Subscriber로 등록되어 있어야 한다.
+ * 수신에 성공하면 해당 Topic의 FIFO Queue에서 가장 오래된 Message를 꺼내 반환한다.
+ *
+ * @param sim        Simulator 포인터
+ * @param node_name  Message를 수신할 Subscriber Node 이름
+ * @param topic_name Message를 수신할 Topic 이름
+ * @return 수신한 Message 포인터, 실패하거나 Queue가 비어 있으면 NULL
+ *
+ * @warning 반환된 Message는 Queue에서 분리된 동적 할당 객체이다.
+ *          호출자는 사용 후 반드시 free() 해야 한다.
+ */
+Message *simulator_receive_message(Simulator *sim, const char *node_name, const char *topic_name);
+
+/**
  * @brief Topic 내부 Message Queue에서 가장 오래된 메시지를 꺼낸다.
  *
  * FIFO 방식으로 Queue의 front에 있는 Message를 제거하고 반환한다.

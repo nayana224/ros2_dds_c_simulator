@@ -59,10 +59,10 @@ int main(void) {
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "second data", 3) == 1,
         "second message publish succeeds");
 
-    message = simulator_dequeue_message(topic);
+    message = simulator_receive_message(&sim, "nav_node", "/scan");
     ok &= assert_true(message != NULL, "first queued message exists");
     ok &= assert_true(strcmp(message->data, "range data") == 0,
-        "first queued message keeps FIFO order");
+        "FR-07 subscriber receives first queued message in FIFO order");
     free(message);
 
     message = simulator_dequeue_message(topic);
@@ -73,6 +73,18 @@ int main(void) {
 
     ok &= assert_true(simulator_dequeue_message(topic) == NULL,
         "queue is empty after dequeuing all messages");
+    ok &= assert_true(simulator_receive_message(&sim, "nav_node", "/scan") == NULL,
+        "message receive fails when queue is empty");
+
+    ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "third data", 1) == 1,
+        "third message publish succeeds");
+    ok &= assert_true(simulator_receive_message(&sim, "lidar_node", "/scan") == NULL,
+        "message receive fails when node is not a subscriber");
+    message = simulator_receive_message(&sim, "nav_node", "/scan");
+    ok &= assert_true(message != NULL, "subscriber can still receive after failed receiver attempt");
+    ok &= assert_true(strcmp(message->data, "third data") == 0,
+        "failed receiver attempt does not dequeue message");
+    free(message);
 
     ok &= assert_true(simulator_publish_message(&sim, "nav_node", "/scan", "range data", 5) == 0,
         "message publish fails when node is not a publisher");
@@ -80,6 +92,8 @@ int main(void) {
         "message publish fails when topic does not exist");
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "", 5) == 0,
         "message publish fails when message is empty");
+    ok &= assert_true(simulator_dequeue_message(topic) == NULL,
+        "failed message publishes do not enqueue messages");
 
     simulator_destroy(&sim);
 
@@ -87,6 +101,6 @@ int main(void) {
         return 1;
     }
 
-    printf("All requested FR-01/FR-02/FR-03/FR-04/FR-05 tests passed.\n");
+    printf("All requested FR-01/FR-02/FR-03/FR-04/FR-05/FR-06/FR-07 tests passed.\n");
     return 0;
 }

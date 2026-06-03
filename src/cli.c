@@ -8,12 +8,13 @@
  *
  * The current Message Publish behavior validates publisher access
  * and stores the published message in the Topic's internal FIFO queue.
- * Receive Message is not connected to the CLI yet.
+ * Receive Message validates subscriber access and dequeues one message.
  */
 
 #include "cli.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -33,6 +34,15 @@ static void read_name_input(char *buffer, size_t size)
     buffer[strcspn(buffer, "\r\n")] = '\0';
 }
 
+static void discard_line_remainder(void)
+{
+    int ch;
+
+    do {
+        ch = getchar();
+    } while (ch != '\n' && ch != EOF);
+}
+
 /**
  * @brief Print the available menu options.
  */
@@ -44,7 +54,7 @@ static void print_menu(void)
     printf("3. Add Publisher\n");
     printf("4. Add Subscriber\n");
     printf("5. Publish Message\n");
-    printf("6. Receive Message (not implemented)\n");
+    printf("6. Receive Message\n");
     printf("7. Print Registered Lists\n");
     printf("8. Print Communication Graph (not implemented)\n");
     printf("9. Search Path Between Nodes (not implemented)\n");
@@ -159,14 +169,55 @@ static void handle_publish_message(Simulator *sim)
     read_name_input(message, sizeof(message));
     printf("Enter priority: ");
     if (scanf("%d", &priority) != 1) {
+        discard_line_remainder();
         printf("Failed to publish message. Invalid priority.\n");
         return;
     }
-    getchar();
+    discard_line_remainder();
 
-    if (!simulator_publish_message(sim, node_name, topic_name, message, priority)) {
+    if (simulator_publish_message(sim, node_name, topic_name, message, priority)) {
+        printf("Message published:\n");
+        printf("Topic: %s\n", topic_name);
+        printf("Publisher: %s\n", node_name);
+        printf("Data: %s\n", message);
+        printf("Priority: %d\n", priority);
+    } else {
         printf("Failed to publish message. Check node/topic/publisher existence or empty message.\n");
     }
+}
+
+
+/**
+ * @brief 메뉴에서 Message 수신을 처리한다.
+ *
+ * Subscriber Node 이름과 Topic 이름을 입력받고,
+ * 해당 Topic의 FIFO Queue에서 가장 오래된 Message를 하나 수신한다.
+ *
+ * @param sim Simulator instance used for receiving.
+ */
+static void handle_receive_message(Simulator *sim)
+{
+    char node_name[SIM_NAME_LENGTH];
+    char topic_name[SIM_NAME_LENGTH];
+    Message *message;
+
+    printf("Enter node name: ");
+    read_name_input(node_name, sizeof(node_name));
+    printf("Enter topic name: ");
+    read_name_input(topic_name, sizeof(topic_name));
+
+    message = simulator_receive_message(sim, node_name, topic_name);
+    if (message == NULL) {
+        printf("Failed to receive message. Check node/topic/subscriber existence or empty queue.\n");
+        return;
+    }
+
+    printf("Message received:\n");
+    printf("Topic: %s\n", topic_name);
+    printf("Subscriber: %s\n", node_name);
+    printf("Data: %s\n", message->data);
+    printf("Priority: %d\n", message->priority);
+    free(message);
 }
 
 
@@ -190,7 +241,7 @@ void cli_run(Simulator *sim)
          * Remove the trailing newline left in the input buffer by scanf("%d", ...).
          * If this is not removed, a later fgets() call may read an empty string.
          */
-        getchar();
+        discard_line_remainder();
 
         switch (choice) {
             case 1:
@@ -208,12 +259,14 @@ void cli_run(Simulator *sim)
             case 5:
                 handle_publish_message(sim);
                 break;
+            case 6:
+                handle_receive_message(sim);
+                break;
             case 7:
                 simulator_print_registered_lists(sim);
                 break;
             case 0:
                 return;
-            case 6:
             case 8:
             case 9:
                 printf("This feature is intentionally not implemented in this step.\n");
