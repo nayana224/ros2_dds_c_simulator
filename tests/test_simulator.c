@@ -56,6 +56,19 @@ int main(void) {
     simulator_print_communication_graph(&sim);
     ok &= assert_true(1, "FR-09 communication graph print is callable");
 
+    ok &= assert_true(simulator_add_node(&sim, "motor_node") == 1,
+        "third node registration succeeds");
+    ok &= assert_true(simulator_add_topic(&sim, "/cmd_vel") == 1,
+        "second topic registration succeeds");
+    ok &= assert_true(simulator_add_publisher(&sim, "nav_node", "/cmd_vel") == 1,
+        "second publisher registration succeeds");
+    ok &= assert_true(simulator_add_subscriber(&sim, "motor_node", "/cmd_vel") == 1,
+        "second subscriber registration succeeds");
+    ok &= assert_true(simulator_print_path_between_nodes(&sim, "lidar_node", "motor_node") == 1,
+        "FR-10 BFS path search succeeds");
+    ok &= assert_true(simulator_print_path_between_nodes(&sim, "motor_node", "lidar_node") == 0,
+        "FR-10 BFS path search fails when directed path does not exist");
+
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "range data", 5) == 1,
         "FR-05 message publish succeeds");
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "second data", 3) == 1,
@@ -133,6 +146,6 @@ int main(void) {
         return 1;
     }
 
-    printf("All requested FR-01/FR-02/FR-03/FR-04/FR-05/FR-06/FR-07/FR-08/FR-09 tests passed.\n");
+    printf("All requested FR-01/FR-02/FR-03/FR-04/FR-05/FR-06/FR-07/FR-08/FR-09/FR-10 tests passed.\n");
     return 0;
 }

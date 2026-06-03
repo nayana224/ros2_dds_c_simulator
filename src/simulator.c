@@ -38,6 +38,9 @@ static Subscriber *find_subscriber_in_topic(const Topic *topic, const char *node
  */
 static Message *create_message_node(const char *message, int priority);
 static void enqueue_message_by_priority(Topic *topic, Message *new_message);
+static int count_nodes(const Simulator *sim);
+static void collect_nodes(const Simulator *sim, const Node **nodes);
+static int find_node_index(const Node **nodes, int node_count, const char *name);
 
 /**
  * @brief Node나 Topic 이름이 유효한지 검사한다.
@@ -872,4 +875,220 @@ void simulator_print_communication_graph(const Simulator *sim)
     if (edge_count == 0) {
         printf("  (empty)\n");
     }
+}
+
+static int count_nodes(const Simulator *sim)
+{
+    const Node *current;
+    int count = 0;
+
+    if (sim == NULL) {
+        return 0;
+    }
+
+    current = sim->nodes;
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+
+    return count;
+}
+
+static void collect_nodes(const Simulator *sim, const Node **nodes)
+{
+    const Node *current;
+    int index = 0;
+
+    if (sim == NULL || nodes == NULL) {
+        return;
+    }
+
+    current = sim->nodes;
+    while (current != NULL) {
+        nodes[index] = current;
+        index++;
+        current = current->next;
+    }
+}
+
+static int find_node_index(const Node **nodes, int node_count, const char *name)
+{
+    int index;
+
+    if (nodes == NULL || name == NULL) {
+        return -1;
+    }
+
+    for (index = 0; index < node_count; index++) {
+        if (strcmp(nodes[index]->name, name) == 0) {
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * @brief 특정 Node에서 다른 Node까지 메시지 전달 경로를 BFS로 탐색하고 출력한다.
+ *
+ * Node를 그래프의 정점으로 보고,
+ * 같은 Topic에서 Publisher -> Subscriber 관계가 있으면 Node 사이에 방향 간선이 있다고 본다.
+ * BFS Queue에는 Node 인덱스를 저장하고, previous 배열과 via_topic 배열로 경로를 복원한다.
+ *
+ * @param sim              Simulator 포인터
+ * @param start_node_name  시작 Node 이름
+ * @param target_node_name 도착 Node 이름
+ * @return 경로가 존재하면 1, 존재하지 않거나 입력이 잘못되면 0
+ *
+ * @note 별도 그래프 구조체를 만들지 않고 Topic/Publisher/Subscriber 연결 리스트를 직접 순회한다.
+ */
+int simulator_print_path_between_nodes(const Simulator *sim, const char *start_node_name, const char *target_node_name)
+{
+    const Node **nodes;
+    int *queue;
+    int *visited;
+    int *previous;
+    const char **via_topic;
+    int node_count;
+    int start_index;
+    int target_index;
+    int front = 0;
+    int rear = 0;
+    int found = 0;
+    int index;
+
+    printf("Path search:\n");
+    if (sim == NULL || start_node_name == NULL || target_node_name == NULL) {
+        printf("  Path not found.\n");
+        return 0;
+    }
+
+    node_count = count_nodes(sim);
+    if (node_count == 0) {
+        printf("  Path not found.\n");
+        return 0;
+    }
+
+    nodes = (const Node **)malloc(sizeof(Node *) * node_count);
+    queue = (int *)malloc(sizeof(int) * node_count);
+    visited = (int *)calloc((size_t)node_count, sizeof(int));
+    previous = (int *)malloc(sizeof(int) * node_count);
+    via_topic = (const char **)calloc((size_t)node_count, sizeof(char *));
+    if (nodes == NULL || queue == NULL || visited == NULL || previous == NULL || via_topic == NULL) {
+        free(nodes);
+        free(queue);
+        free(visited);
+        free(previous);
+        free(via_topic);
+        printf("  Path not found.\n");
+        return 0;
+    }
+
+    collect_nodes(sim, nodes);
+    for (index = 0; index < node_count; index++) {
+        previous[index] = -1;
+    }
+
+    start_index = find_node_index(nodes, node_count, start_node_name);
+    target_index = find_node_index(nodes, node_count, target_node_name);
+    if (start_index == -1 || target_index == -1) {
+        printf("  Path not found.\n");
+        free(nodes);
+        free(queue);
+        free(visited);
+        free(previous);
+        free(via_topic);
+        return 0;
+    }
+
+    if (start_index == target_index) {
+        printf("  Path found: %s\n", nodes[start_index]->name);
+        free(nodes);
+        free(queue);
+        free(visited);
+        free(previous);
+        free(via_topic);
+        return 1;
+    }
+
+    visited[start_index] = 1;
+    queue[rear] = start_index;
+    rear++;
+
+    while (front < rear && !found) {
+        int current_index = queue[front];
+        const char *current_name = nodes[current_index]->name;
+        const Topic *topic = sim->topics;
+
+        front++;
+        while (topic != NULL && !found) {
+            if (find_publisher_in_topic(topic, current_name) != NULL) {
+                const Subscriber *subscriber = topic->subscribers;
+
+                while (subscriber != NULL) {
+                    int next_index = find_node_index(nodes, node_count, subscriber->node_name);
+
+                    if (next_index != -1 && !visited[next_index]) {
+                        visited[next_index] = 1;
+                        previous[next_index] = current_index;
+                        via_topic[next_index] = topic->name;
+                        queue[rear] = next_index;
+                        rear++;
+
+                        if (next_index == target_index) {
+                            found = 1;
+                            break;
+                        }
+                    }
+
+                    subscriber = subscriber->next;
+                }
+            }
+
+            topic = topic->next;
+        }
+    }
+
+    if (found) {
+        int *path;
+        int path_length = 0;
+        int current_index = target_index;
+
+        path = (int *)malloc(sizeof(int) * node_count);
+        if (path == NULL) {
+            printf("  Path not found.\n");
+            free(nodes);
+            free(queue);
+            free(visited);
+            free(previous);
+            free(via_topic);
+            return 0;
+        }
+
+        while (current_index != -1) {
+            path[path_length] = current_index;
+            path_length++;
+            current_index = previous[current_index];
+        }
+
+        printf("  Path found: ");
+        for (index = path_length - 1; index >= 0; index--) {
+            printf("%s", nodes[path[index]]->name);
+            if (index > 0) {
+                printf(" -> %s -> ", via_topic[path[index - 1]]);
+            }
+        }
+        printf("\n");
+        free(path);
+    } else {
+        printf("  Path not found.\n");
+    }
+
+    free(nodes);
+    free(queue);
+    free(visited);
+    free(previous);
+    free(via_topic);
+    return found;
 }

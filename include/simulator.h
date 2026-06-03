@@ -191,6 +191,19 @@ void simulator_print_registered_lists(const Simulator *sim);
 void simulator_print_communication_graph(const Simulator *sim);
 
 /**
+ * @brief 특정 Node에서 다른 Node까지 메시지 전달 경로를 BFS로 탐색하고 출력한다.
+ *
+ * Publisher Node -> Topic -> Subscriber Node 관계를 방향 그래프로 보고,
+ * start_node_name에서 target_node_name까지 도달 가능한 경로가 있는지 탐색한다.
+ *
+ * @param sim              Simulator 포인터
+ * @param start_node_name  시작 Node 이름
+ * @param target_node_name 도착 Node 이름
+ * @return 경로가 존재하면 1, 존재하지 않거나 입력이 잘못되면 0
+ */
+int simulator_print_path_between_nodes(const Simulator *sim, const char *start_node_name, const char *target_node_name);
+
+/**
  * @brief 특정 Node를 특정 Topic의 Publisher로 등록한다.
  *
  * Node와 Topic은 모두 이미 Simulator에 등록되어 있어야 한다.
