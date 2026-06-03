@@ -1,6 +1,8 @@
 #include "simulator.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static int assert_true(int condition, const char *message) {
     if (!condition) {
@@ -14,6 +16,7 @@ static int assert_true(int condition, const char *message) {
 
 int main(void) {
     Simulator sim;
+    Message *message;
     Topic *topic;
     int ok = 1;
 
@@ -53,6 +56,24 @@ int main(void) {
 
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "range data", 5) == 1,
         "FR-05 message publish succeeds");
+    ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "second data", 3) == 1,
+        "second message publish succeeds");
+
+    message = simulator_dequeue_message(topic);
+    ok &= assert_true(message != NULL, "first queued message exists");
+    ok &= assert_true(strcmp(message->data, "range data") == 0,
+        "first queued message keeps FIFO order");
+    free(message);
+
+    message = simulator_dequeue_message(topic);
+    ok &= assert_true(message != NULL, "second queued message exists");
+    ok &= assert_true(strcmp(message->data, "second data") == 0,
+        "second queued message keeps FIFO order");
+    free(message);
+
+    ok &= assert_true(simulator_dequeue_message(topic) == NULL,
+        "queue is empty after dequeuing all messages");
+
     ok &= assert_true(simulator_publish_message(&sim, "nav_node", "/scan", "range data", 5) == 0,
         "message publish fails when node is not a publisher");
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/missing", "range data", 5) == 0,

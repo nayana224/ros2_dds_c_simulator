@@ -1,13 +1,14 @@
 /**
  * @file cli.c
- * @brief Menu-driven CLI entry point for the ROS2 Pub/Sub C simulator.
+ * @brief Menu-driven CLI for the ROS2 Pub/Sub C simulator.
  *
  * This file reads menu input and dispatches Node registration,
  * Topic registration, Publisher registration, Subscriber registration,
  * Message Publish, and registered-list printing.
  *
- * The current Message Publish behavior only validates publisher access
- * and prints the message details. It does not store messages in a queue.
+ * The current Message Publish behavior validates publisher access
+ * and stores the published message in the Topic's internal FIFO queue.
+ * Receive Message is not connected to the CLI yet.
  */
 
 #include "cli.h"

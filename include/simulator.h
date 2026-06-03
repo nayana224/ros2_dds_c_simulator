@@ -15,26 +15,35 @@
 #include <stddef.h>
 
 #define SIM_NAME_LENGTH 64
+typedef struct Message Message;
+
 
 /**
- * @brief ROS2 Node를 표현하는 연결 리스트 노드
+ * @brief ROS2 Node를 표현하는 연결 리스트 노드.
+ *
+ * Simulator는 등록된 Node들을 단일 연결 리스트로 관리한다.
  */
 typedef struct Node {
-    char name[SIM_NAME_LENGTH];
-    struct Node *next; 
+    char name[SIM_NAME_LENGTH]; /**< Node 이름 */
+    struct Node *next; /**< 다음 Node를 가리키는 포인터 */
 } Node;
+
 
 /**
  * @brief ROS2 Topic을 표현하는 연결 리스트 노드.
  *
- * 각 Topic은 해당 Topic에 연결된 Publisher 목록과 Subscriber 목록을
- * 별도의 연결 리스트로 관리한다.
+ * 각 Topic은 Publisher 목록, Subscriber 목록, Message Queue를 소유한다.
+ *
+ * Publisher와 Subscriber는 각각 연결 리스트로 관리된다.
+ * Message Queue는 message_head와 message_tail을 사용하는 FIFO Queue로 구현된다.
  */
 typedef struct Topic {
-    char name[SIM_NAME_LENGTH];
-    struct Publisher *publishers;
-    struct Subscriber *subscribers;
-    struct Topic *next;
+    char name[SIM_NAME_LENGTH]; /**< Topic 이름 */
+    struct Publisher *publishers; /**< Publisher 연결 리스트의 head pointer */
+    struct Subscriber *subscribers; /**< Subscriber 연결 리스트의 head pointer */
+    Message *message_head; /**< Message Queue의 front */
+    Message *message_tail; /**< Message Queue의 rear */
+    struct Topic *next; /**< 다음 Topic을 가리키는 포인터 */
 } Topic;
 
 /**
@@ -44,9 +53,10 @@ typedef struct Topic {
  * 이 구조체는 Topic 내부 Publisher 리스트의 원소로 사용된다.
  */
 typedef struct Publisher {
-    char node_name[SIM_NAME_LENGTH];
-    struct Publisher *next;
+    char node_name[SIM_NAME_LENGTH]; /**< Publisher로 등록된 Node 이름 */
+    struct Publisher *next; /**< 다음 Publisher를 가리키는 포인터 */
 } Publisher;
+
 
 /**
  * @brief 특정 Topic에 연결된 Subscriber 정보를 표현하는 연결 리스트 노드.
@@ -55,23 +65,37 @@ typedef struct Publisher {
  * 이 구조체는 Topic 내부 Subscriber 리스트의 원소로 사용된다.
  */
 typedef struct Subscriber {
-    char node_name[SIM_NAME_LENGTH];
-    struct Subscriber *next;
+    char node_name[SIM_NAME_LENGTH]; /**< Subscriber로 등록된 Node 이름 */
+    struct Subscriber *next; /**< 다음 Subscriber를 가리키는 포인터 */
 } Subscriber;
 
+
 /**
- * @brief 시뮬레이터 전체 상태를 담는 구조체.
- * 
- * nodes는 등록된 Node 리스트의 head pointer이고,
- * topics는 등록된 Topic 리스트의 head pointer이다.
+ * @brief Topic 내부 Message Queue의 원소를 표현하는 연결 리스트 노드.
+ *
+ * publish된 메시지는 Message 노드로 동적 할당되어
+ * Topic의 message_head/message_tail 기반 FIFO Queue에 저장된다.
+ *
+ * priority 값은 이후 QoS 우선순위 처리 확장을 위해 저장하지만,
+ * 현재 FR-06 단계에서는 Queue 정렬에 사용하지 않는다.
+ */
+typedef struct Message {
+    char data[SIM_NAME_LENGTH]; /**< 메시지 데이터 */
+    int priority; /**< 메시지 우선순위 값 */
+    struct Message *next; /**< 다음 Message를 가리키는 포인터 */
+} Message;
+
+
+/**
+ * @brief 시뮬레이터 전체 상태를 담는 최상위 구조체.
+ *
+ * Simulator는 등록된 Node 리스트와 Topic 리스트의 head pointer를 소유한다.
+ * Topic 내부에는 Publisher/Subscriber 리스트와 Message Queue가 포함된다.
  */
 typedef struct Simulator {
-    Node *nodes; // Node's head pointer
-    Topic *topics; // Topic's head pointer
+    Node *nodes; /**< 등록된 Node 연결 리스트의 head pointer */
+    Topic *topics; /**< 등록된 Topic 연결 리스트의 head pointer */
 } Simulator;
-
-
-
 
 
 /**
@@ -82,8 +106,11 @@ typedef struct Simulator {
 void simulator_init(Simulator *sim);
 
 /**
- * @brief Simulator가 동적으로 할당한 모든 메모리를 해체한다.
- * 
+ * @brief Simulator가 동적으로 할당한 모든 메모리를 해제한다.
+ *
+ * Node 리스트, Topic 리스트, 각 Topic 내부의 Publisher 리스트,
+ * Subscriber 리스트, Message Queue를 모두 해제한다.
+ *
  * @param sim 해제할 Simulator 포인터
  */
 void simulator_destroy(Simulator *sim);
@@ -140,8 +167,8 @@ Topic *simulator_find_topic(const Simulator *sim, const char *name);
 void simulator_print_nodes(const Simulator *sim);
 
 /**
- * @brief 등록된 Topic 목록을 출력한다.
- * 
+ * @brief 등록된 Topic 목록과 각 Topic의 Publisher/Subscriber 목록을 출력한다.
+ *
  * @param sim Simulator 포인터
  */
 void simulator_print_topics(const Simulator *sim);
@@ -180,22 +207,37 @@ int simulator_add_publisher(Simulator *sim, const char *node_name, const char *t
 int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *topic_name);
 
 /**
- * @brief Publisher Node가 특정 Topic에 메시지를 발행한다.
- *
- * 현재 구현은 메시지를 실제 Queue에 저장하지 않고,
- * 발행 가능 조건을 검사한 뒤 메시지 정보를 출력한다.
+ * @brief Publisher Node가 특정 Topic에 메시지를 발행하고 Queue에 저장한다.
  *
  * 발행이 성공하려면 Node와 Topic이 이미 등록되어 있어야 하며,
  * 해당 Node가 해당 Topic의 Publisher로 등록되어 있어야 한다.
+ *
+ * 성공 시 Message 노드를 생성하여 해당 Topic 내부 FIFO Queue의 tail에 추가한다.
  *
  * @param sim        Simulator 포인터
  * @param node_name  메시지를 발행할 Publisher Node 이름
  * @param topic_name 메시지를 발행할 Topic 이름
  * @param message    발행할 메시지 문자열
  * @param priority   메시지 우선순위 값
- * @return 발행 성공 시 1, 실패 시 0
+ * @return 발행 및 Queue 저장 성공 시 1, 실패 시 0
+ *
+ * @note 현재 Queue는 priority 값을 저장하지만 정렬에는 사용하지 않는다.
  */
 int simulator_publish_message(Simulator *sim, const char *node_name, const char *topic_name, const char *message, int priority);
+
+/**
+ * @brief Topic 내부 Message Queue에서 가장 오래된 메시지를 꺼낸다.
+ *
+ * FIFO 방식으로 Queue의 front에 있는 Message를 제거하고 반환한다.
+ * Queue가 비어 있으면 NULL을 반환한다.
+ *
+ * @param topic 메시지를 꺼낼 Topic 포인터
+ * @return dequeue된 Message 포인터, Queue가 비어 있으면 NULL
+ *
+ * @warning 반환된 Message는 Queue에서 분리된 동적 할당 객체이다.
+ *          호출자는 사용 후 반드시 free() 해야 한다.
+ */
+Message *simulator_dequeue_message(Topic *topic);
 
 /**
  * @brief 특정 Topic에서 node_name에 해당하는 Publisher를 탐색한다.

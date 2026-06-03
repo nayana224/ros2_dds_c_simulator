@@ -27,6 +27,18 @@ static Publisher *find_publisher_in_topic(const Topic *topic, const char *node_n
 static Subscriber *find_subscriber_in_topic(const Topic *topic, const char *node_name);
 
 /**
+ * @brief Message Queue에 저장할 새 Message 노드를 생성한다.
+ *
+ * message 문자열과 priority 값을 Message 구조체에 복사하고,
+ * next를 NULL로 초기화하여 Queue의 마지막 노드로 사용할 수 있게 한다.
+ *
+ * @param message  저장할 메시지 문자열
+ * @param priority 메시지 우선순위 값
+ * @return 생성된 Message 포인터, 메모리 할당 실패 시 NULL
+ */
+static Message *create_message_node(const char *message, int priority);
+
+/**
  * @brief Node나 Topic 이름이 유효한지 검사한다.
  * 
  * simulator.c 내부에서만 사용하는 보조 함수.
@@ -41,6 +53,19 @@ static Subscriber *find_subscriber_in_topic(const Topic *topic, const char *node
  */
 static int is_valid_name(const char *name) {
     return name != NULL && name[0] != '\0' && strlen(name) < SIM_NAME_LENGTH;
+}
+
+static Message *create_message_node(const char *message, int priority) {
+    Message *new_message = (Message *)malloc(sizeof(Message));
+
+    if (new_message == NULL) {
+        return NULL;
+    }
+
+    strcpy(new_message->data, message);
+    new_message->priority = priority;
+    new_message->next = NULL;
+    return new_message;
 }
 
 /**
@@ -64,23 +89,18 @@ static void destroy_node_list(Node *head) {
 }
 
 /**
- * @brief Topic 연결 리스트와 각 Topic 내부의 Publisher/Subscriber 리스트를 해제한다.
+ * @brief Topic 리스트와 각 Topic이 소유한 내부 리스트/Queue를 모두 해제한다.
  *
- * 각 Topic은 Publisher 연결 리스트와 Subscriber 연결 리스트를 소유한다.
- * 따라서 Topic 자체를 free하기 전에 내부 Publisher/Subscriber 리스트를 먼저 순회하며 해제해야 한다.
+ * 각 Topic은 Message Queue, Publisher 리스트, Subscriber 리스트를 소유한다.
+ * 따라서 Topic 자체를 free하기 전에 내부 Message, Publisher, Subscriber를
+ * 먼저 모두 해제해야 한다.
  *
  * 해제 순서:
- * 1. 다음 Topic 주소를 next에 저장한다.
- * 2. 현재 Topic의 Publisher 리스트를 모두 free한다.
- * 3. 현재 Topic의 Subscriber 리스트를 모두 free한다.
- * 4. 현재 Topic을 free한다.
- * 5. next로 이동한다.
- *
- * @param head Topic 연결 리스트의 head pointer
- *
- * @note 시간복잡도는 O(T + P_total + S_total)이다.
- *       T는 Topic 수, P_total은 전체 Publisher 등록 수,
- *       S_total은 전체 Subscriber 등록 수이다.
+ * 1. 다음 Topic 주소를 저장한다.
+ * 2. 현재 Topic의 Message Queue를 모두 free한다.
+ * 3. 현재 Topic의 Publisher 리스트를 모두 free한다.
+ * 4. 현재 Topic의 Subscriber 리스트를 모두 free한다.
+ * 5. 현재 Topic을 free한다.
  */
 static void destroy_topic_list(Topic *head) {
     Topic *current = head;
@@ -88,8 +108,14 @@ static void destroy_topic_list(Topic *head) {
     /* Free every topic in the linked list one by one. */
     while (current != NULL) {
         Topic *next = current->next;
+        Message *message = current->message_head;
         Publisher *publisher = current->publishers;
         Subscriber *subscriber = current->subscribers;
+        while (message != NULL) {
+            Message *message_next = message->next;
+            free(message);
+            message = message_next;
+        }
         while (publisher != NULL) {
             Publisher *publisher_next = publisher->next;
             free(publisher);
@@ -103,6 +129,11 @@ static void destroy_topic_list(Topic *head) {
         free(current);
         current = next;
     }
+}
+
+static int is_valid_message(const char *message)
+{
+    return message != NULL && message[0] != '\0' && strlen(message) < SIM_NAME_LENGTH;
 }
 
 
@@ -207,7 +238,8 @@ Topic *simulator_find_topic(const Simulator *sim, const char *name) {
  * @param node_name 찾을 Publisher Node 이름
  * @return 찾은 Publisher 포인터, 없으면 NULL
  */
-Publisher *simulator_find_publisher(const Topic *topic, const char *node_name) {
+Publisher *simulator_find_publisher(const Topic *topic, const char *node_name) 
+{
     return find_publisher_in_topic(topic, node_name);
 }
 
@@ -220,7 +252,8 @@ Publisher *simulator_find_publisher(const Topic *topic, const char *node_name) {
  * @param node_name 찾을 Subscriber Node 이름
  * @return 찾은 Subscriber 포인터, 없으면 NULL
  */
-Subscriber *simulator_find_subscriber(const Topic *topic, const char *node_name) {
+Subscriber *simulator_find_subscriber(const Topic *topic, const char *node_name) 
+{
     return find_subscriber_in_topic(topic, node_name);
 }
 
@@ -236,7 +269,8 @@ Subscriber *simulator_find_subscriber(const Topic *topic, const char *node_name)
  *
  * @note 시간복잡도는 Topic에 등록된 Publisher 수를 P라고 할 때 O(P)이다.
  */
-static Publisher *find_publisher_in_topic(const Topic *topic, const char *node_name) {
+static Publisher *find_publisher_in_topic(const Topic *topic, const char *node_name) 
+{
     Publisher *current;
 
     if (topic == NULL || node_name == NULL) {
@@ -266,7 +300,8 @@ static Publisher *find_publisher_in_topic(const Topic *topic, const char *node_n
  *
  * @note 시간복잡도는 Topic에 등록된 Subscriber 수를 S라고 할 때 O(S)이다.
  */
-static Subscriber *find_subscriber_in_topic(const Topic *topic, const char *node_name) {
+static Subscriber *find_subscriber_in_topic(const Topic *topic, const char *node_name) 
+{
     Subscriber *current;
 
     if (topic == NULL || node_name == NULL) {
@@ -295,7 +330,8 @@ static Subscriber *find_subscriber_in_topic(const Topic *topic, const char *node
  *
  * @note 시간복잡도는 해당 Topic의 Publisher 수를 P라고 할 때 O(P)이다.
  */
-static void print_publisher_list(const Topic *topic) {
+static void print_publisher_list(const Topic *topic)
+{
     Publisher *current;
     int index = 1;
 
@@ -323,7 +359,8 @@ static void print_publisher_list(const Topic *topic) {
  *
  * @note 시간복잡도는 해당 Topic의 Subscriber 수를 S라고 할 때 O(S)이다.
  */
-static void print_subscriber_list(const Topic *topic) {
+static void print_subscriber_list(const Topic *topic) 
+{
     Subscriber *current;
     int index = 1;
 
@@ -358,7 +395,8 @@ static void print_subscriber_list(const Topic *topic) {
  * - head 삽입: O(1)
  * - 전체: O(N)
  */
-int simulator_add_node(Simulator *sim, const char *name) {
+int simulator_add_node(Simulator *sim, const char *name) 
+{
     Node *new_node;
 
     if (sim == NULL || !is_valid_name(name)) {
@@ -426,6 +464,8 @@ int simulator_add_topic(Simulator *sim, const char *name)
     */
     new_topic->publishers = NULL;
     new_topic->subscribers = NULL;
+    new_topic->message_head = NULL;
+    new_topic->message_tail = NULL;
 
     new_topic->next = sim->topics;
     sim->topics = new_topic;
@@ -548,11 +588,26 @@ int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *
     return 1;
 }
 
+
+Message *simulator_dequeue_message(Topic *topic)
+{
+    Message *message;
+
+    if (topic == NULL || topic->message_head == NULL) {
+        return NULL;
+    }
+
+    message = topic->message_head;
+    topic->message_head = message->next;
+    if (topic->message_head == NULL) {
+        topic->message_tail = NULL;
+    }
+    message->next = NULL;
+    return message;
+}
+
 /**
- * @brief 특정 Publisher Node가 Topic에 메시지를 발행한다.
- *
- * 현재 단계에서는 실제 Message Queue에 메시지를 저장하지 않고,
- * 메시지 발행 조건을 검사한 뒤 발행 정보를 출력한다.
+ * @brief 특정 Publisher Node가 Topic에 메시지를 발행하고 Topic 내부 Queue에 저장한다.
  *
  * 발행이 성공하려면 다음 조건을 만족해야 한다.
  * - Simulator 포인터가 NULL이 아니어야 한다.
@@ -562,24 +617,32 @@ int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *
  * - topic_name에 해당하는 Topic이 등록되어 있어야 한다.
  * - 해당 Node가 해당 Topic의 Publisher로 등록되어 있어야 한다.
  *
+ * 조건을 만족하면 Message 노드를 생성하고,
+ * 해당 Topic의 message_tail 뒤에 연결하여 FIFO Queue에 enqueue한다.
+ *
  * @param sim        Simulator 포인터
  * @param node_name  메시지를 발행할 Publisher Node 이름
  * @param topic_name 메시지를 발행할 Topic 이름
  * @param message    발행할 메시지 문자열
  * @param priority   메시지 우선순위 값
- * @return 발행 성공 시 1, 실패 시 0
+ * @return 발행 및 Queue 저장 성공 시 1, 실패 시 0
  *
- * @note 현재 구현은 메시지를 저장하지 않고 출력만 수행한다.
- *       이후 단계에서 Topic 내부 Message Queue에 enqueue하는 방식으로 확장할 수 있다.
+ * @note 현재 Queue는 priority 값을 저장하지만 정렬에는 사용하지 않는다.
+ *       따라서 처리 순서는 FIFO이다.
  *
  * @note 시간복잡도는 O(N + T + P)이다.
- *       N은 Node 수, T는 Topic 수, P는 해당 Topic의 Publisher 수이다.
+ *       Node 탐색 O(N), Topic 탐색 O(T), Publisher 탐색 O(P),
+ *       Queue enqueue 자체는 O(1)이다.
  */
 int simulator_publish_message(Simulator *sim, const char *node_name, const char *topic_name, const char *message, int priority)
 {
     Topic *topic;
+    Message *new_message;
 
-    if (sim == NULL || !is_valid_name(node_name) || !is_valid_name(topic_name) || message == NULL || message[0] == '\0') {
+    if (sim == NULL ||
+        !is_valid_name(node_name) ||
+        !is_valid_name(topic_name) ||
+        !is_valid_message(message)) {
         return 0;
     }
 
@@ -594,6 +657,19 @@ int simulator_publish_message(Simulator *sim, const char *node_name, const char 
 
     if (find_publisher_in_topic(topic, node_name) == NULL) {
         return 0;
+    }
+
+    new_message = create_message_node(message, priority);
+    if (new_message == NULL) {
+        return 0;
+    }
+
+    if (topic->message_tail == NULL) {
+        topic->message_head = new_message;
+        topic->message_tail = new_message;
+    } else {
+        topic->message_tail->next = new_message;
+        topic->message_tail = new_message;
     }
 
     printf("Message published:\n");
@@ -614,7 +690,8 @@ int simulator_publish_message(Simulator *sim, const char *node_name, const char 
  * 
  * 시간복잡도: O(N)
  */
-void simulator_print_nodes(const Simulator *sim) {
+void simulator_print_nodes(const Simulator *sim) 
+{
     const Node *current;
     int index = 1;
 
