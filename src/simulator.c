@@ -37,6 +37,7 @@ static Subscriber *find_subscriber_in_topic(const Topic *topic, const char *node
  * @return 생성된 Message 포인터, 메모리 할당 실패 시 NULL
  */
 static Message *create_message_node(const char *message, int priority);
+static void enqueue_message_by_priority(Topic *topic, Message *new_message);
 
 /**
  * @brief Node나 Topic 이름이 유효한지 검사한다.
@@ -66,6 +67,49 @@ static Message *create_message_node(const char *message, int priority) {
     new_message->priority = priority;
     new_message->next = NULL;
     return new_message;
+}
+
+/**
+ * @brief Topic의 Message Queue에 priority 기준으로 Message를 삽입한다.
+ *
+ * Message 연결 리스트를 priority 내림차순으로 유지한다.
+ * 새 Message의 priority가 더 높으면 head 앞에 삽입하고,
+ * 같은 priority끼리는 기존 삽입 순서를 유지하도록 뒤쪽에 삽입한다.
+ *
+ * @param topic       Message를 저장할 Topic 포인터
+ * @param new_message 삽입할 Message 포인터
+ */
+static void enqueue_message_by_priority(Topic *topic, Message *new_message)
+{
+    Message *current;
+
+    if (topic == NULL || new_message == NULL) {
+        return;
+    }
+
+    if (topic->message_head == NULL) {
+        topic->message_head = new_message;
+        topic->message_tail = new_message;
+        return;
+    }
+
+    if (new_message->priority > topic->message_head->priority) {
+        new_message->next = topic->message_head;
+        topic->message_head = new_message;
+        return;
+    }
+
+    current = topic->message_head;
+    while (current->next != NULL && current->next->priority >= new_message->priority) {
+        current = current->next;
+    }
+
+    new_message->next = current->next;
+    current->next = new_message;
+
+    if (new_message->next == NULL) {
+        topic->message_tail = new_message;
+    }
 }
 
 /**
@@ -612,7 +656,7 @@ Message *simulator_dequeue_message(Topic *topic)
  * 수신 전에 Node와 Topic이 등록되어 있는지 확인하고,
  * 해당 Node가 Topic의 Subscriber 목록에 있는지 연결 리스트를 탐색한다.
  * 모든 조건을 만족하면 simulator_dequeue_message()를 사용해
- * FIFO Queue의 front Message를 꺼내 반환한다.
+ * priority queue의 front Message를 꺼내 반환한다.
  *
  * @param sim        Simulator 포인터
  * @param node_name  Message를 수신할 Subscriber Node 이름
@@ -659,7 +703,7 @@ Message *simulator_receive_message(Simulator *sim, const char *node_name, const 
  * - 해당 Node가 해당 Topic의 Publisher로 등록되어 있어야 한다.
  *
  * 조건을 만족하면 Message 노드를 생성하고,
- * 해당 Topic의 message_tail 뒤에 연결하여 FIFO Queue에 enqueue한다.
+ * 해당 Topic의 priority queue에 enqueue한다.
  *
  * @param sim        Simulator 포인터
  * @param node_name  메시지를 발행할 Publisher Node 이름
@@ -668,8 +712,8 @@ Message *simulator_receive_message(Simulator *sim, const char *node_name, const 
  * @param priority   메시지 우선순위 값
  * @return 발행 및 Queue 저장 성공 시 1, 실패 시 0
  *
- * @note 현재 Queue는 priority 값을 저장하지만 정렬에는 사용하지 않는다.
- *       따라서 처리 순서는 FIFO이다.
+ * @note priority 값이 높은 Message가 먼저 수신되도록 정렬 삽입한다.
+ *       priority 값이 같으면 기존 발행 순서를 유지한다.
  *
  * @note 시간복잡도는 O(N + T + P)이다.
  *       Node 탐색 O(N), Topic 탐색 O(T), Publisher 탐색 O(P),
@@ -705,13 +749,7 @@ int simulator_publish_message(Simulator *sim, const char *node_name, const char 
         return 0;
     }
 
-    if (topic->message_tail == NULL) {
-        topic->message_head = new_message;
-        topic->message_tail = new_message;
-    } else {
-        topic->message_tail->next = new_message;
-        topic->message_tail = new_message;
-    }
+    enqueue_message_by_priority(topic, new_message);
 
     return 1;
 }

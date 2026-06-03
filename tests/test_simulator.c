@@ -62,13 +62,13 @@ int main(void) {
     message = simulator_receive_message(&sim, "nav_node", "/scan");
     ok &= assert_true(message != NULL, "first queued message exists");
     ok &= assert_true(strcmp(message->data, "range data") == 0,
-        "FR-07 subscriber receives first queued message in FIFO order");
+        "FR-07 subscriber receives queued message");
     free(message);
 
     message = simulator_dequeue_message(topic);
     ok &= assert_true(message != NULL, "second queued message exists");
     ok &= assert_true(strcmp(message->data, "second data") == 0,
-        "second queued message keeps FIFO order");
+        "second queued message remains after first receive");
     free(message);
 
     ok &= assert_true(simulator_dequeue_message(topic) == NULL,
@@ -86,6 +86,36 @@ int main(void) {
         "failed receiver attempt does not dequeue message");
     free(message);
 
+    ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "normal data", 1) == 1,
+        "normal priority message publish succeeds");
+    ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "emergency data", 10) == 1,
+        "high priority message publish succeeds");
+    message = simulator_receive_message(&sim, "nav_node", "/scan");
+    ok &= assert_true(message != NULL, "FR-08 high priority message exists");
+    ok &= assert_true(strcmp(message->data, "emergency data") == 0,
+        "FR-08 high priority message is received before lower priority message");
+    free(message);
+    message = simulator_receive_message(&sim, "nav_node", "/scan");
+    ok &= assert_true(message != NULL, "normal priority message exists after high priority receive");
+    ok &= assert_true(strcmp(message->data, "normal data") == 0,
+        "lower priority message remains queued after high priority receive");
+    free(message);
+
+    ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "same priority first", 4) == 1,
+        "first same-priority message publish succeeds");
+    ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "same priority second", 4) == 1,
+        "second same-priority message publish succeeds");
+    message = simulator_receive_message(&sim, "nav_node", "/scan");
+    ok &= assert_true(message != NULL, "first same-priority message exists");
+    ok &= assert_true(strcmp(message->data, "same priority first") == 0,
+        "same priority messages keep FIFO order");
+    free(message);
+    message = simulator_receive_message(&sim, "nav_node", "/scan");
+    ok &= assert_true(message != NULL, "second same-priority message exists");
+    ok &= assert_true(strcmp(message->data, "same priority second") == 0,
+        "second same-priority message is received after first");
+    free(message);
+
     ok &= assert_true(simulator_publish_message(&sim, "nav_node", "/scan", "range data", 5) == 0,
         "message publish fails when node is not a publisher");
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/missing", "range data", 5) == 0,
@@ -101,6 +131,6 @@ int main(void) {
         return 1;
     }
 
-    printf("All requested FR-01/FR-02/FR-03/FR-04/FR-05/FR-06/FR-07 tests passed.\n");
+    printf("All requested FR-01/FR-02/FR-03/FR-04/FR-05/FR-06/FR-07/FR-08 tests passed.\n");
     return 0;
 }

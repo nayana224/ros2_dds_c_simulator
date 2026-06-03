@@ -35,7 +35,7 @@ typedef struct Node {
  * 각 Topic은 Publisher 목록, Subscriber 목록, Message Queue를 소유한다.
  *
  * Publisher와 Subscriber는 각각 연결 리스트로 관리된다.
- * Message Queue는 message_head와 message_tail을 사용하는 FIFO Queue로 구현된다.
+ * Message Queue는 message_head와 message_tail을 사용하는 priority queue로 구현된다.
  */
 typedef struct Topic {
     char name[SIM_NAME_LENGTH]; /**< Topic 이름 */
@@ -74,10 +74,10 @@ typedef struct Subscriber {
  * @brief Topic 내부 Message Queue의 원소를 표현하는 연결 리스트 노드.
  *
  * publish된 메시지는 Message 노드로 동적 할당되어
- * Topic의 message_head/message_tail 기반 FIFO Queue에 저장된다.
+ * Topic의 message_head/message_tail 기반 priority queue에 저장된다.
  *
- * priority 값은 이후 QoS 우선순위 처리 확장을 위해 저장하지만,
- * 현재 FR-06 단계에서는 Queue 정렬에 사용하지 않는다.
+ * priority 값이 높은 Message가 먼저 수신되며,
+ * priority 값이 같으면 기존 발행 순서를 유지한다.
  */
 typedef struct Message {
     char data[SIM_NAME_LENGTH]; /**< 메시지 데이터 */
@@ -212,7 +212,7 @@ int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *
  * 발행이 성공하려면 Node와 Topic이 이미 등록되어 있어야 하며,
  * 해당 Node가 해당 Topic의 Publisher로 등록되어 있어야 한다.
  *
- * 성공 시 Message 노드를 생성하여 해당 Topic 내부 FIFO Queue의 tail에 추가한다.
+ * 성공 시 Message 노드를 생성하여 해당 Topic 내부 priority queue에 추가한다.
  *
  * @param sim        Simulator 포인터
  * @param node_name  메시지를 발행할 Publisher Node 이름
@@ -221,7 +221,7 @@ int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *
  * @param priority   메시지 우선순위 값
  * @return 발행 및 Queue 저장 성공 시 1, 실패 시 0
  *
- * @note 현재 Queue는 priority 값을 저장하지만 정렬에는 사용하지 않는다.
+ * @note priority 값이 높은 Message가 먼저 수신되도록 정렬 삽입한다.
  */
 int simulator_publish_message(Simulator *sim, const char *node_name, const char *topic_name, const char *message, int priority);
 
@@ -229,7 +229,7 @@ int simulator_publish_message(Simulator *sim, const char *node_name, const char 
  * @brief Subscriber Node가 구독 중인 Topic에서 Message를 수신한다.
  *
  * node_name에 해당하는 Node가 topic_name Topic의 Subscriber로 등록되어 있어야 한다.
- * 수신에 성공하면 해당 Topic의 FIFO Queue에서 가장 오래된 Message를 꺼내 반환한다.
+ * 수신에 성공하면 해당 Topic의 priority queue에서 우선순위가 가장 높은 Message를 꺼내 반환한다.
  *
  * @param sim        Simulator 포인터
  * @param node_name  Message를 수신할 Subscriber Node 이름
@@ -244,7 +244,7 @@ Message *simulator_receive_message(Simulator *sim, const char *node_name, const 
 /**
  * @brief Topic 내부 Message Queue에서 가장 오래된 메시지를 꺼낸다.
  *
- * FIFO 방식으로 Queue의 front에 있는 Message를 제거하고 반환한다.
+ * Queue의 front에 있는 Message를 제거하고 반환한다.
  * Queue가 비어 있으면 NULL을 반환한다.
  *
  * @param topic 메시지를 꺼낼 Topic 포인터

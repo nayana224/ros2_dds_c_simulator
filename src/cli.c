@@ -7,7 +7,7 @@
  * Message Publish, and registered-list printing.
  *
  * The current Message Publish behavior validates publisher access
- * and stores the published message in the Topic's internal FIFO queue.
+ * and stores the published message in the Topic's internal priority queue.
  * Receive Message validates subscriber access and dequeues one message.
  */
 
@@ -191,7 +191,7 @@ static void handle_publish_message(Simulator *sim)
  * @brief 메뉴에서 Message 수신을 처리한다.
  *
  * Subscriber Node 이름과 Topic 이름을 입력받고,
- * 해당 Topic의 FIFO Queue에서 가장 오래된 Message를 하나 수신한다.
+ * 해당 Topic의 priority queue에서 우선순위가 가장 높은 Message를 하나 수신한다.
  *
  * @param sim Simulator instance used for receiving.
  */
