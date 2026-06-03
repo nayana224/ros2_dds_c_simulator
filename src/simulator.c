@@ -420,10 +420,10 @@ int simulator_add_topic(Simulator *sim, const char *name)
     /* Insert the new topic at the head of the linked list in O(1) time. */
     strcpy(new_topic->name, name);
 
-    /**
-     * 새 Topic은 생성 직후 Publisher/Subscriber가 없으므로
-     * 각 연결 리스트의 head pointer를 NULL로 초기화한다.
-     */
+    /*
+    * 새 Topic은 생성 직후 Publisher/Subscriber가 없으므로
+    * 각 연결 리스트의 head pointer를 NULL로 초기화한다.
+    */
     new_topic->publishers = NULL;
     new_topic->subscribers = NULL;
 
@@ -548,6 +548,33 @@ int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *
     return 1;
 }
 
+/**
+ * @brief 특정 Publisher Node가 Topic에 메시지를 발행한다.
+ *
+ * 현재 단계에서는 실제 Message Queue에 메시지를 저장하지 않고,
+ * 메시지 발행 조건을 검사한 뒤 발행 정보를 출력한다.
+ *
+ * 발행이 성공하려면 다음 조건을 만족해야 한다.
+ * - Simulator 포인터가 NULL이 아니어야 한다.
+ * - node_name과 topic_name이 유효한 이름이어야 한다.
+ * - message가 NULL 또는 빈 문자열이 아니어야 한다.
+ * - node_name에 해당하는 Node가 등록되어 있어야 한다.
+ * - topic_name에 해당하는 Topic이 등록되어 있어야 한다.
+ * - 해당 Node가 해당 Topic의 Publisher로 등록되어 있어야 한다.
+ *
+ * @param sim        Simulator 포인터
+ * @param node_name  메시지를 발행할 Publisher Node 이름
+ * @param topic_name 메시지를 발행할 Topic 이름
+ * @param message    발행할 메시지 문자열
+ * @param priority   메시지 우선순위 값
+ * @return 발행 성공 시 1, 실패 시 0
+ *
+ * @note 현재 구현은 메시지를 저장하지 않고 출력만 수행한다.
+ *       이후 단계에서 Topic 내부 Message Queue에 enqueue하는 방식으로 확장할 수 있다.
+ *
+ * @note 시간복잡도는 O(N + T + P)이다.
+ *       N은 Node 수, T는 Topic 수, P는 해당 Topic의 Publisher 수이다.
+ */
 int simulator_publish_message(Simulator *sim, const char *node_name, const char *topic_name, const char *message, int priority)
 {
     Topic *topic;

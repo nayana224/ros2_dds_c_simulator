@@ -1,9 +1,12 @@
 /**
  * @file main.c
  * @brief ROS2 Pub/Sub C Simulator의 메뉴 기반 CLI 진입점.
- * 
+ *
  * 이 파일은 사용자의 메뉴 입력을 받아 Node 등록, Topic 등록,
- * 등록 목록 출력 기능을 실행한다.
+ * Publisher 등록, Subscriber 등록, Message Publish, 등록 목록 출력 기능을 실행한다.
+ *
+ * 현재 Message Publish 기능은 실제 Queue 저장 없이
+ * Publisher 권한 검사 후 메시지 정보를 출력하는 단계이다.
  */
 
 #include "simulator.h"
@@ -103,6 +106,19 @@ static void handle_add_topic(Simulator *sim) {
     }
 }
 
+/**
+ * @brief Publisher 등록 메뉴 동작을 처리한다.
+ *
+ * 사용자로부터 Node 이름과 Topic 이름을 입력받고
+ * simulator_add_publisher()를 호출하여 해당 Node를 Topic의 Publisher로 등록한다.
+ *
+ * 등록이 성공하려면 다음 조건을 만족해야 한다.
+ * - Node가 이미 등록되어 있어야 한다.
+ * - Topic이 이미 등록되어 있어야 한다.
+ * - 같은 Node가 같은 Topic의 Publisher로 중복 등록되어 있지 않아야 한다.
+ *
+ * @param sim Publisher를 등록할 Simulator 포인터
+ */
 static void handle_add_publisher(Simulator *sim) {
     char node_name[SIM_NAME_LENGTH];
     char topic_name[SIM_NAME_LENGTH];
@@ -119,6 +135,19 @@ static void handle_add_publisher(Simulator *sim) {
     }
 }
 
+/**
+ * @brief Subscriber 등록 메뉴 동작을 처리한다.
+ *
+ * 사용자로부터 Node 이름과 Topic 이름을 입력받고
+ * simulator_add_subscriber()를 호출하여 해당 Node를 Topic의 Subscriber로 등록한다.
+ *
+ * 등록이 성공하려면 다음 조건을 만족해야 한다.
+ * - Node가 이미 등록되어 있어야 한다.
+ * - Topic이 이미 등록되어 있어야 한다.
+ * - 같은 Node가 같은 Topic의 Subscriber로 중복 등록되어 있지 않아야 한다.
+ *
+ * @param sim Subscriber를 등록할 Simulator 포인터
+ */
 static void handle_add_subscriber(Simulator *sim) {
     char node_name[SIM_NAME_LENGTH];
     char topic_name[SIM_NAME_LENGTH];
@@ -135,6 +164,23 @@ static void handle_add_subscriber(Simulator *sim) {
     }
 }
 
+/**
+ * @brief 메시지 발행 메뉴 동작을 처리한다.
+ *
+ * 사용자로부터 Publisher Node 이름, Topic 이름, 메시지 내용, priority 값을 입력받고
+ * simulator_publish_message()를 호출한다.
+ *
+ * 현재 단계의 메시지 발행 기능은 실제 Message Queue에 저장하지 않고,
+ * 발행 가능 조건을 검사한 뒤 메시지 정보를 출력하는 방식으로 동작한다.
+ *
+ * 발행이 성공하려면 다음 조건을 만족해야 한다.
+ * - Node가 이미 등록되어 있어야 한다.
+ * - Topic이 이미 등록되어 있어야 한다.
+ * - 해당 Node가 해당 Topic의 Publisher로 등록되어 있어야 한다.
+ * - message가 NULL 또는 빈 문자열이 아니어야 한다.
+ *
+ * @param sim 메시지를 발행할 Simulator 포인터
+ */
 static void handle_publish_message(Simulator *sim) {
     char node_name[SIM_NAME_LENGTH];
     char topic_name[SIM_NAME_LENGTH];
