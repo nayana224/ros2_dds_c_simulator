@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -Werror -std=c11 -Iinclude
 TARGET = ros2_dds_simulator
 TEST_TARGET = test_simulator
 
-SRC = src/main.c src/simulator.c
+SRC = src/main.c src/cli.c src/simulator.c
 TEST_SRC = tests/test_simulator.c src/simulator.c
 
 .PHONY: all run test clean
