@@ -1,15 +1,32 @@
-# 00. 프로젝트 개요
+# 00. Project Overview
 
-## 1. 문제 정의
-ROS2 시스템에서는 여러 Node가 Topic을 통해 메시지를 주고받는다. 실제 ROS2는 DDS 미들웨어를 사용하지만, 본 프로젝트에서는 이를 자료구조 관점에서 단순화하여 구현한다.
+## 1. Problem statement
 
-## 2. 해결 방법
-Node, Topic, Publisher, Subscriber 관계를 연결 리스트와 그래프로 표현하고, 메시지 전달 과정은 큐와 우선순위 큐를 사용하여 시뮬레이션한다.
+ROS2 systems exchange messages through nodes and topics, typically using DDS
+middleware. This project does not use real ROS2 or DDS. Instead, it models the
+same high-level pub/sub concepts with basic C data structures.
 
-## 3. 기대 결과
-사용자는 명령어 기반 인터페이스를 통해 Node와 Topic을 등록하고, 메시지를 발행하며, Subscriber가 메시지를 수신하는 과정을 확인할 수 있다.
+## 2. Approach
 
-## 4. 구현 범위
-- 실제 ROS2 라이브러리는 사용하지 않는다.
-- 실제 네트워크 통신은 구현하지 않는다.
-- DDS의 핵심 개념인 publish/subscribe, topic matching, QoS priority를 단순화한다.
+The simulator represents:
+
+- nodes and topics with linked structures
+- publisher/subscriber relationships as topic-attached lists
+- queued messages with a per-topic priority queue
+- communication reachability with graph-style traversal and BFS
+
+## 3. Expected outcome
+
+Users can:
+
+- register nodes and topics
+- connect publishers and subscribers
+- publish and receive messages
+- inspect communication relationships
+- search for message paths between nodes
+
+## 4. Scope
+
+- no real ROS2 library usage
+- no real network communication
+- simplified modeling of pub/sub, topic matching, QoS-like priority, and path search

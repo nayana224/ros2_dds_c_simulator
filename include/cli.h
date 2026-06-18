@@ -1,8 +1,6 @@
 /**
  * @file cli.h
- * @brief ROS2 Pub/Sub C Simulator의 명령어 기반 CLI 인터페이스.
- *
- * 이 헤더는 사용자 명령어를 읽어 Simulator API로 전달하는 CLI 실행 함수를 선언한다.
+ * @brief Command-line interface for the ROS2-style pub/sub simulator.
  */
 
 #ifndef CLI_H
@@ -11,13 +9,13 @@
 #include "simulator.h"
 
 /**
- * @brief 명령어 기반 CLI 루프를 실행한다.
+ * @brief Runs the interactive command-line loop.
  *
- * 사용자는 `add_node`, `add_topic`, `publish`, `receive`, `graph`, `search` 등의
- * 명령어를 입력하여 Simulator 상태를 조작할 수 있다.
- * Simulator의 초기화와 해제는 호출자가 담당한다.
+ * This function reads user commands from standard input, dispatches them to
+ * the simulator API, and prints results to standard output. The loop
+ * continues until the user enters an exit command or input ends.
  *
- * @param sim CLI에서 사용할 Simulator 포인터
+ * @param sim Simulator instance used by the CLI.
  */
 void cli_run(Simulator *sim);
 

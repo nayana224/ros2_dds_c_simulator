@@ -1,0 +1,39 @@
+\chapter{AGENTS.\+md }
+\hypertarget{md__a_g_e_n_t_s}{}\label{md__a_g_e_n_t_s}\index{AGENTS.md@{AGENTS.md}}
+\label{md__a_g_e_n_t_s_autotoc_md0}%
+\Hypertarget{md__a_g_e_n_t_s_autotoc_md0}%
+\hypertarget{md__a_g_e_n_t_s_autotoc_md1}{}\doxysection{\texorpdfstring{Project Goal}{Project Goal}}\label{md__a_g_e_n_t_s_autotoc_md1}
+Implement a C-\/based simulator that mimics ROS2-\/style Pub/\+Sub communication using data structures.\hypertarget{md__a_g_e_n_t_s_autotoc_md2}{}\doxysection{\texorpdfstring{Important Constraints}{Important Constraints}}\label{md__a_g_e_n_t_s_autotoc_md2}
+
+\begin{DoxyItemize}
+\item Use C language only.
+\item Do not use actual ROS2 libraries.
+\item Do not use DDS, RTPS, sockets, or external networking libraries.
+\item The simulator must run locally on a single laptop.
+\item Focus on data structures\+: linked list, queue, priority queue, graph.
+\item Keep the code simple enough for a data structure course final project.
+\item Every major function must have comments explaining the data structure operation.
+\end{DoxyItemize}\hypertarget{md__a_g_e_n_t_s_autotoc_md3}{}\doxysection{\texorpdfstring{Build}{Build}}\label{md__a_g_e_n_t_s_autotoc_md3}
+Use Makefile.
+
+Commands\+:
+\begin{DoxyItemize}
+\item {\ttfamily make}
+\item {\ttfamily make run}
+\item {\ttfamily make test}
+\item {\ttfamily make clean}
+\end{DoxyItemize}\hypertarget{md__a_g_e_n_t_s_autotoc_md4}{}\doxysection{\texorpdfstring{Implementation Rule}{Implementation Rule}}\label{md__a_g_e_n_t_s_autotoc_md4}
+Before modifying code\+:
+\begin{DoxyEnumerate}
+\item Read \doxylink{01__requirements_8md}{docs/01\+\_\+requirements.\+md}.
+\item Read \doxylink{02__data__structure__design_8md}{docs/02\+\_\+data\+\_\+structure\+\_\+design.\+md}.
+\item Read \doxylink{05__test__plan_8md}{docs/05\+\_\+test\+\_\+plan.\+md}.
+\item Implement only the requested task.
+\item Do not rewrite unrelated files.
+\end{DoxyEnumerate}\hypertarget{md__a_g_e_n_t_s_autotoc_md5}{}\doxysection{\texorpdfstring{Testing Rule}{Testing Rule}}\label{md__a_g_e_n_t_s_autotoc_md5}
+After implementation\+:
+\begin{DoxyEnumerate}
+\item Run {\ttfamily make test}.
+\item Run at least one example scenario.
+\item Report what passed and what failed. 
+\end{DoxyEnumerate}

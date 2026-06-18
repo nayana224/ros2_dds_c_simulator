@@ -1,0 +1,109 @@
+\doxysection{Topic Struct Reference}
+\hypertarget{struct_topic}{}\label{struct_topic}\index{Topic@{Topic}}
+
+
+A topic registered in the simulator.  
+
+
+
+
+{\ttfamily \#include $<$simulator.\+h$>$}
+
+
+
+Collaboration diagram for Topic\+:
+% FIG 0
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char \mbox{\hyperlink{struct_topic_a2c5d9cac1084145b12541325fc18da64}{name}} \mbox{[}\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\+\_\+\+NAME\+\_\+\+LENGTH}}\mbox{]}
+\item 
+struct \mbox{\hyperlink{struct_publisher}{Publisher}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_topic_a5e561131bcfd03b16dcbae33880445fd}{publishers}}
+\item 
+struct \mbox{\hyperlink{struct_subscriber}{Subscriber}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_topic_aebbbac14fb4a11da4093f98f02e4f628}{subscribers}}
+\item 
+\mbox{\hyperlink{struct_message}{Message}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_topic_a270797d41239cad5d4d9fea4d17960ce}{message\+\_\+head}}
+\item 
+\mbox{\hyperlink{struct_message}{Message}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_topic_a5afd42b2c75c16cff73a025aadc121c4}{message\+\_\+tail}}
+\item 
+struct \mbox{\hyperlink{struct_topic}{Topic}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_topic_a299e6ca71718ba47817c95151bfff54d}{next}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A topic registered in the simulator. 
+
+Each topic owns a publisher list, a subscriber list, and a message queue ordered by priority. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00042}{42}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+
+
+\label{doc-variable-members}
+\Hypertarget{struct_topic_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_topic_a270797d41239cad5d4d9fea4d17960ce}\index{Topic@{Topic}!message\_head@{message\_head}}
+\index{message\_head@{message\_head}!Topic@{Topic}}
+\doxysubsubsection{\texorpdfstring{message\_head}{message\_head}}
+{\footnotesize\ttfamily \label{struct_topic_a270797d41239cad5d4d9fea4d17960ce} 
+\mbox{\hyperlink{struct_message}{Message}}\texorpdfstring{$\ast$}{*} Topic\+::message\+\_\+head}
+
+Front of the per-\/topic message queue. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00046}{46}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+\Hypertarget{struct_topic_a5afd42b2c75c16cff73a025aadc121c4}\index{Topic@{Topic}!message\_tail@{message\_tail}}
+\index{message\_tail@{message\_tail}!Topic@{Topic}}
+\doxysubsubsection{\texorpdfstring{message\_tail}{message\_tail}}
+{\footnotesize\ttfamily \label{struct_topic_a5afd42b2c75c16cff73a025aadc121c4} 
+\mbox{\hyperlink{struct_message}{Message}}\texorpdfstring{$\ast$}{*} Topic\+::message\+\_\+tail}
+
+Rear of the per-\/topic message queue. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00047}{47}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+\Hypertarget{struct_topic_a2c5d9cac1084145b12541325fc18da64}\index{Topic@{Topic}!name@{name}}
+\index{name@{name}!Topic@{Topic}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{struct_topic_a2c5d9cac1084145b12541325fc18da64} 
+char Topic\+::name\mbox{[}\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\+\_\+\+NAME\+\_\+\+LENGTH}}\mbox{]}}
+
+\doxylink{struct_topic}{Topic} name. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00043}{43}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+\Hypertarget{struct_topic_a299e6ca71718ba47817c95151bfff54d}\index{Topic@{Topic}!next@{next}}
+\index{next@{next}!Topic@{Topic}}
+\doxysubsubsection{\texorpdfstring{next}{next}}
+{\footnotesize\ttfamily \label{struct_topic_a299e6ca71718ba47817c95151bfff54d} 
+struct \mbox{\hyperlink{struct_topic}{Topic}}\texorpdfstring{$\ast$}{*} Topic\+::next}
+
+Next topic in the registered topic list. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00048}{48}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+\Hypertarget{struct_topic_a5e561131bcfd03b16dcbae33880445fd}\index{Topic@{Topic}!publishers@{publishers}}
+\index{publishers@{publishers}!Topic@{Topic}}
+\doxysubsubsection{\texorpdfstring{publishers}{publishers}}
+{\footnotesize\ttfamily \label{struct_topic_a5e561131bcfd03b16dcbae33880445fd} 
+struct \mbox{\hyperlink{struct_publisher}{Publisher}}\texorpdfstring{$\ast$}{*} Topic\+::publishers}
+
+Head of the publisher list for this topic. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00044}{44}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+\Hypertarget{struct_topic_aebbbac14fb4a11da4093f98f02e4f628}\index{Topic@{Topic}!subscribers@{subscribers}}
+\index{subscribers@{subscribers}!Topic@{Topic}}
+\doxysubsubsection{\texorpdfstring{subscribers}{subscribers}}
+{\footnotesize\ttfamily \label{struct_topic_aebbbac14fb4a11da4093f98f02e4f628} 
+struct \mbox{\hyperlink{struct_subscriber}{Subscriber}}\texorpdfstring{$\ast$}{*} Topic\+::subscribers}
+
+Head of the subscriber list for this topic. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00045}{45}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\mbox{\hyperlink{simulator_8h}{simulator.\+h}}\end{DoxyCompactItemize}

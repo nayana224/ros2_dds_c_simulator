@@ -1,0 +1,61 @@
+\doxysection{Subscriber Struct Reference}
+\hypertarget{struct_subscriber}{}\label{struct_subscriber}\index{Subscriber@{Subscriber}}
+
+
+A subscriber entry attached to a topic.  
+
+
+
+
+{\ttfamily \#include $<$simulator.\+h$>$}
+
+
+
+Collaboration diagram for Subscriber\+:
+% FIG 0
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char \mbox{\hyperlink{struct_subscriber_afc37a0e4e2295cc796b9908b4f17cf2b}{node\+\_\+name}} \mbox{[}\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\+\_\+\+NAME\+\_\+\+LENGTH}}\mbox{]}
+\item 
+struct \mbox{\hyperlink{struct_subscriber}{Subscriber}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_subscriber_a327bc55516213b6b0a5a9989e5f54f0f}{next}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A subscriber entry attached to a topic. 
+
+The entry stores the subscriber node name rather than a direct pointer to a \doxylink{struct_node}{Node} object. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00068}{68}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+
+
+\label{doc-variable-members}
+\Hypertarget{struct_subscriber_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_subscriber_a327bc55516213b6b0a5a9989e5f54f0f}\index{Subscriber@{Subscriber}!next@{next}}
+\index{next@{next}!Subscriber@{Subscriber}}
+\doxysubsubsection{\texorpdfstring{next}{next}}
+{\footnotesize\ttfamily \label{struct_subscriber_a327bc55516213b6b0a5a9989e5f54f0f} 
+struct \mbox{\hyperlink{struct_subscriber}{Subscriber}}\texorpdfstring{$\ast$}{*} Subscriber\+::next}
+
+Next subscriber in the topic subscriber list. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00070}{70}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+\Hypertarget{struct_subscriber_afc37a0e4e2295cc796b9908b4f17cf2b}\index{Subscriber@{Subscriber}!node\_name@{node\_name}}
+\index{node\_name@{node\_name}!Subscriber@{Subscriber}}
+\doxysubsubsection{\texorpdfstring{node\_name}{node\_name}}
+{\footnotesize\ttfamily \label{struct_subscriber_afc37a0e4e2295cc796b9908b4f17cf2b} 
+char Subscriber\+::node\+\_\+name\mbox{[}\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\+\_\+\+NAME\+\_\+\+LENGTH}}\mbox{]}}
+
+Name of the registered subscriber node. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00069}{69}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\mbox{\hyperlink{simulator_8h}{simulator.\+h}}\end{DoxyCompactItemize}

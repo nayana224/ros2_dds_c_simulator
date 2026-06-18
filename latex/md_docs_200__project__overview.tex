@@ -1,0 +1,14 @@
+\chapter{00. 프로젝트 개요 }
+\hypertarget{md_docs_200__project__overview}{}\label{md_docs_200__project__overview}\index{00. 프로젝트 개요@{00. 프로젝트 개요}}
+\label{md_docs_200__project__overview_autotoc_md6}%
+\Hypertarget{md_docs_200__project__overview_autotoc_md6}%
+\hypertarget{md_docs_200__project__overview_autotoc_md7}{}\doxysection{\texorpdfstring{1. 문제 정의}{1. 문제 정의}}\label{md_docs_200__project__overview_autotoc_md7}
+ROS2 시스템에서는 여러 Node가 Topic을 통해 메시지를 주고받는다. 실제 ROS2는 DDS 미들웨어를 사용하지만, 본 프로젝트에서는 이를 자료구조 관점에서 단순화하여 구현한다.\hypertarget{md_docs_200__project__overview_autotoc_md8}{}\doxysection{\texorpdfstring{2. 해결 방법}{2. 해결 방법}}\label{md_docs_200__project__overview_autotoc_md8}
+\doxylink{struct_node}{Node}, \doxylink{struct_topic}{Topic}, \doxylink{struct_publisher}{Publisher}, \doxylink{struct_subscriber}{Subscriber} 관계를 연결 리스트와 그래프로 표현하고, 메시지 전달 과정은 큐와 우선순위 큐를 사용하여 시뮬레이션한다.\hypertarget{md_docs_200__project__overview_autotoc_md9}{}\doxysection{\texorpdfstring{3. 기대 결과}{3. 기대 결과}}\label{md_docs_200__project__overview_autotoc_md9}
+사용자는 명령어 기반 인터페이스를 통해 Node와 Topic을 등록하고, 메시지를 발행하며, Subscriber가 메시지를 수신하는 과정을 확인할 수 있다.\hypertarget{md_docs_200__project__overview_autotoc_md10}{}\doxysection{\texorpdfstring{4. 구현 범위}{4. 구현 범위}}\label{md_docs_200__project__overview_autotoc_md10}
+
+\begin{DoxyItemize}
+\item 실제 ROS2 라이브러리는 사용하지 않는다.
+\item 실제 네트워크 통신은 구현하지 않는다.
+\item DDS의 핵심 개념인 publish/subscribe, topic matching, QoS priority를 단순화한다. 
+\end{DoxyItemize}

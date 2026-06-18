@@ -1,0 +1,19 @@
+digraph "cli_run"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="cli_run",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="명령어 기반 CLI 루프를 실행한다."];
+  Node1 -> Node2 [id="edge6_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="simulator_print_communication\l_graph",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$simulator_8c.html#a562c5e4ffda40014d346e56057c4adeb",tooltip="Prints the communication graph to standard output."];
+  Node1 -> Node3 [id="edge7_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="simulator_print_path\l_between_nodes",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$simulator_8c.html#a11c4dd9744226b0608aa5bd4d687a4bf",tooltip="Searches for and prints a directed communication path between nodes."];
+  Node1 -> Node4 [id="edge8_Node000001_Node000004",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="simulator_print_registered\l_lists",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$simulator_8c.html#a42938682d138be1faf5ff0d255073d6e",tooltip="Prints the registered node list and topic list to standard output."];
+  Node4 -> Node5 [id="edge9_Node000004_Node000005",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="simulator_print_nodes",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$simulator_8c.html#aceb2a27108c5e83711efc923b6bcb045",tooltip="등록된 Node 연결 리스트를 출력한다."];
+  Node4 -> Node6 [id="edge10_Node000004_Node000006",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="simulator_print_topics",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$simulator_8c.html#af664a36ce2716625c82c5c74827b1db9",tooltip="등록된 Topic과 각 Topic의 Publisher/Subscriber 연결 리스트를 출력한다."];
+}

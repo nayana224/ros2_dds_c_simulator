@@ -1,10 +1,9 @@
 /**
  * @file cli.c
- * @brief ROS2 Pub/Sub C Simulator의 명령어 기반 CLI 구현.
+ * @brief Command-line interface implementation for the pub/sub simulator.
  *
- * 사용자가 입력한 한 줄 명령어를 파싱하여 Simulator API를 호출한다.
- * 실제 ROS2 명령어와 동일하지는 않지만, `add_node`, `publish`, `receive`, `graph`,
- * `search` 같은 명령어를 통해 Pub/Sub 시뮬레이터를 조작할 수 있게 한다.
+ * This file parses user commands, validates basic CLI input, and dispatches
+ * operations to the simulator core.
  */
 
 #include "cli.h"
@@ -16,20 +15,20 @@
 #include <string.h>
 
 /**
- * @brief CLI 한 줄 입력 버퍼의 최대 길이.
+ * @brief Maximum length of a single input line read by the CLI.
  */
 #define CLI_LINE_LENGTH 256
 
 /**
- * @brief 한 명령어에서 분리할 수 있는 최대 토큰 수.
+ * @brief Maximum number of tokens parsed from one command line.
  */
 #define CLI_MAX_TOKENS 8
 
 /**
- * @brief 표준 입력에서 문자열 한 줄을 읽고 줄바꿈 문자를 제거한다.
+ * @brief Reads one line from standard input and removes trailing newlines.
  *
- * @param buffer 입력 문자열을 저장할 버퍼
- * @param size 버퍼 전체 크기
+ * @param buffer Output buffer for the line text.
+ * @param size Size of @p buffer in bytes.
  */
 static void read_name_input(char *buffer, size_t size)
 {
@@ -42,15 +41,15 @@ static void read_name_input(char *buffer, size_t size)
 }
 
 /**
- * @brief 명령어 한 줄을 공백 기준 토큰 배열로 분리한다.
+ * @brief Splits a command line into whitespace-delimited tokens.
  *
- * 큰따옴표로 감싼 문자열은 공백을 포함해 하나의 토큰으로 처리한다.
- * 예를 들어 `"range data"`는 하나의 message 인자로 분리된다.
+ * Double-quoted text is treated as a single token so that messages containing
+ * spaces can be passed as one argument.
  *
- * @param line 파싱할 명령어 문자열
- * @param tokens 분리된 토큰 포인터를 저장할 배열
- * @param max_tokens tokens 배열의 최대 원소 수
- * @return 분리된 토큰 개수
+ * @param line Input line to tokenize. The buffer is modified in place.
+ * @param tokens Output array of token pointers.
+ * @param max_tokens Maximum number of token pointers that can be stored.
+ * @return Number of tokens parsed from the line.
  */
 static int split_command(char *line, char *tokens[], int max_tokens)
 {
@@ -95,13 +94,11 @@ static int split_command(char *line, char *tokens[], int max_tokens)
 }
 
 /**
- * @brief 문자열 인자를 int 값으로 변환한다.
+ * @brief Parses a decimal integer argument.
  *
- * priority 입력값이 정수 범위를 벗어나거나 숫자가 아니면 실패한다.
- *
- * @param text 정수로 변환할 문자열
- * @param value 변환된 정수를 저장할 포인터
- * @return 변환 성공 시 1, 실패 시 0
+ * @param text Input text to parse.
+ * @param value Output location for the parsed integer.
+ * @return 1 if parsing succeeds, or 0 if the input is invalid.
  */
 static int parse_int_arg(const char *text, int *value)
 {
@@ -122,7 +119,7 @@ static int parse_int_arg(const char *text, int *value)
 }
 
 /**
- * @brief CLI에서 사용할 수 있는 명령어 목록을 출력한다.
+ * @brief Prints the list of supported CLI commands.
  */
 static void print_help(void)
 {
@@ -142,10 +139,10 @@ static void print_help(void)
 }
 
 /**
- * @brief `add_node` 명령어를 처리한다.
+ * @brief Handles the `add_node` command.
  *
- * @param sim Simulator 포인터
- * @param name 등록할 Node 이름
+ * @param sim Simulator instance.
+ * @param name Node name to register.
  */
 static void handle_add_node(Simulator *sim, const char *name)
 {
@@ -157,10 +154,10 @@ static void handle_add_node(Simulator *sim, const char *name)
 }
 
 /**
- * @brief `add_topic` 명령어를 처리한다.
+ * @brief Handles the `add_topic` command.
  *
- * @param sim Simulator 포인터
- * @param name 등록할 Topic 이름
+ * @param sim Simulator instance.
+ * @param name Topic name to register.
  */
 static void handle_add_topic(Simulator *sim, const char *name)
 {
@@ -172,11 +169,11 @@ static void handle_add_topic(Simulator *sim, const char *name)
 }
 
 /**
- * @brief `add_publisher` 명령어를 처리한다.
+ * @brief Handles the `add_publisher` command.
  *
- * @param sim Simulator 포인터
- * @param node_name Publisher로 등록할 Node 이름
- * @param topic_name Publisher를 등록할 Topic 이름
+ * @param sim Simulator instance.
+ * @param node_name Node name to register as a publisher.
+ * @param topic_name Topic name to attach the publisher to.
  */
 static void handle_add_publisher(Simulator *sim, const char *node_name, const char *topic_name)
 {
@@ -188,11 +185,11 @@ static void handle_add_publisher(Simulator *sim, const char *node_name, const ch
 }
 
 /**
- * @brief `add_subscriber` 명령어를 처리한다.
+ * @brief Handles the `add_subscriber` command.
  *
- * @param sim Simulator 포인터
- * @param node_name Subscriber로 등록할 Node 이름
- * @param topic_name Subscriber를 등록할 Topic 이름
+ * @param sim Simulator instance.
+ * @param node_name Node name to register as a subscriber.
+ * @param topic_name Topic name to attach the subscriber to.
  */
 static void handle_add_subscriber(Simulator *sim, const char *node_name, const char *topic_name)
 {
@@ -204,16 +201,16 @@ static void handle_add_subscriber(Simulator *sim, const char *node_name, const c
 }
 
 /**
- * @brief `publish` 명령어를 처리한다.
+ * @brief Handles the `publish` command.
  *
- * priority 문자열을 정수로 변환한 뒤, Publisher 권한 검증과 Message priority queue 삽입은
- * Simulator API에 위임한다.
+ * This function parses the priority argument and forwards the publish request
+ * to the simulator core.
  *
- * @param sim Simulator 포인터
- * @param node_name Message를 발행할 Publisher Node 이름
- * @param topic_name Message를 발행할 Topic 이름
- * @param message 발행할 Message 데이터
- * @param priority_text priority 정수 문자열
+ * @param sim Simulator instance.
+ * @param node_name Publisher node name.
+ * @param topic_name Target topic name.
+ * @param message Message payload.
+ * @param priority_text Priority value as CLI text.
  */
 static void handle_publish_message(Simulator *sim, const char *node_name, const char *topic_name, const char *message, const char *priority_text)
 {
@@ -236,14 +233,14 @@ static void handle_publish_message(Simulator *sim, const char *node_name, const 
 }
 
 /**
- * @brief `receive` 명령어를 처리한다.
+ * @brief Handles the `receive` command.
  *
- * Subscriber 권한 검증과 priority queue front 제거는 Simulator API에 위임한다.
- * 수신한 Message는 CLI에서 출력한 뒤 `free()`로 해제한다.
+ * The CLI prints the received message and releases the returned heap-allocated
+ * Message object after use.
  *
- * @param sim Simulator 포인터
- * @param node_name Message를 수신할 Subscriber Node 이름
- * @param topic_name Message를 수신할 Topic 이름
+ * @param sim Simulator instance.
+ * @param node_name Subscriber node name.
+ * @param topic_name Target topic name.
  */
 static void handle_receive_message(Simulator *sim, const char *node_name, const char *topic_name)
 {
@@ -264,7 +261,7 @@ static void handle_receive_message(Simulator *sim, const char *node_name, const 
 }
 
 /**
- * @brief 잘못된 명령어 형식에 대한 안내 메시지를 출력한다.
+ * @brief Prints a generic usage error for malformed commands.
  */
 static void print_usage_error(void)
 {
@@ -272,13 +269,82 @@ static void print_usage_error(void)
 }
 
 /**
- * @brief 명령어 기반 CLI 루프를 실행한다.
+ * @brief Handles the `list` command.
  *
- * 한 줄 명령어를 읽고 토큰으로 분리한 뒤, 첫 번째 토큰을 명령어 이름으로 해석한다.
- * 각 명령어는 Simulator API를 호출하여 Node/Topic 등록, 메시지 발행/수신,
- * 그래프 출력, BFS 경로 탐색을 수행한다.
+ * The simulator core formats the registered node and topic lists, and the CLI
+ * prints the resulting text.
  *
- * @param sim CLI에서 사용할 Simulator 포인터
+ * @param sim Simulator instance.
+ */
+static void handle_print_registered_lists(Simulator *sim)
+{
+    char list_buffer[CLI_LINE_LENGTH * 16];
+
+    if (simulator_format_registered_lists(sim, list_buffer, sizeof(list_buffer))) {
+        printf("%s", list_buffer);
+    } else {
+        printf("Node list:\n");
+        printf("  (empty)\n");
+        printf("Topic list:\n");
+        printf("  (empty)\n");
+    }
+}
+
+/**
+ * @brief Handles the `graph` command.
+ *
+ * The simulator core formats the graph content, and the CLI prints the
+ * user-facing heading and body.
+ *
+ * @param sim Simulator instance.
+ */
+static void handle_print_graph(Simulator *sim)
+{
+    char graph_buffer[CLI_LINE_LENGTH * 8];
+
+    printf("Communication graph:\n");
+    if (simulator_format_communication_graph(sim, graph_buffer, sizeof(graph_buffer))) {
+        printf("%s", graph_buffer);
+    } else {
+        printf("  (empty)\n");
+    }
+}
+
+/**
+ * @brief Handles the `search` command.
+ *
+ * The simulator core computes the path string, and the CLI is responsible for
+ * printing the user-facing result.
+ *
+ * @param sim Simulator instance.
+ * @param start_node_name Source node name.
+ * @param target_node_name Destination node name.
+ */
+static void handle_search_path(Simulator *sim, const char *start_node_name, const char *target_node_name)
+{
+    char path_buffer[CLI_LINE_LENGTH * 2];
+
+    printf("Path search:\n");
+    if (simulator_format_path_between_nodes(
+            sim,
+            start_node_name,
+            target_node_name,
+            path_buffer,
+            sizeof(path_buffer))) {
+        printf("  Path found: %s\n", path_buffer);
+    } else {
+        printf("  Path not found.\n");
+    }
+}
+
+/**
+ * @brief Runs the interactive command loop.
+ *
+ * The CLI reads commands from standard input, tokenizes them, dispatches the
+ * corresponding simulator operations, and prints results to standard output.
+ * The loop exits when the user enters `exit` or `quit`.
+ *
+ * @param sim Simulator instance controlled by the CLI.
  */
 void cli_run(Simulator *sim)
 {
@@ -338,12 +404,12 @@ void cli_run(Simulator *sim)
                 print_usage_error();
             }
         } else if (strcmp(tokens[0], "list") == 0) {
-            simulator_print_registered_lists(sim);
+            handle_print_registered_lists(sim);
         } else if (strcmp(tokens[0], "graph") == 0) {
-            simulator_print_communication_graph(sim);
+            handle_print_graph(sim);
         } else if (strcmp(tokens[0], "search") == 0) {
             if (token_count == 3) {
-                simulator_print_path_between_nodes(sim, tokens[1], tokens[2]);
+                handle_search_path(sim, tokens[1], tokens[2]);
             } else {
                 print_usage_error();
             }

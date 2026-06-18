@@ -1,0 +1,159 @@
+\chapter{05. 테스트 계획 }
+\hypertarget{md_docs_205__test__plan}{}\label{md_docs_205__test__plan}\index{05. 테스트 계획@{05. 테스트 계획}}
+\label{md_docs_205__test__plan_autotoc_md50}%
+\Hypertarget{md_docs_205__test__plan_autotoc_md50}%
+\hypertarget{md_docs_205__test__plan_autotoc_md51}{}\doxysection{\texorpdfstring{1. 테스트 목표}{1. 테스트 목표}}\label{md_docs_205__test__plan_autotoc_md51}
+이 문서는 ROS2 DDS C Simulator의 기능 요구사항 FR-\/01부터 FR-\/10까지를 검증하기 위한 테스트 시나리오를 정리한다.
+
+테스트는 두 가지 방식으로 수행한다.
+
+
+\begin{DoxyItemize}
+\item 자동 테스트\+: {\ttfamily mingw32-\/make test}
+\item 수동 CLI 테스트\+: {\ttfamily mingw32-\/make run} 실행 후 명령어 입력
+\end{DoxyItemize}\hypertarget{md_docs_205__test__plan_autotoc_md52}{}\doxysection{\texorpdfstring{2. 자동 테스트}{2. 자동 테스트}}\label{md_docs_205__test__plan_autotoc_md52}
+\hypertarget{md_docs_205__test__plan_autotoc_md53}{}\doxysubsection{\texorpdfstring{실행 명령}{실행 명령}}\label{md_docs_205__test__plan_autotoc_md53}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mingw32-\/make\ test}
+
+\end{DoxyCode}
+\hypertarget{md_docs_205__test__plan_autotoc_md54}{}\doxysubsection{\texorpdfstring{검증 범위}{검증 범위}}\label{md_docs_205__test__plan_autotoc_md54}
+
+\begin{DoxyTable}{3}{}{}{1}
+\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}ID  &\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}검증 기능  &\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}주요 확인 내용  \\
+Test-\/01  &\doxylink{struct_node}{Node} 등록  &정상 등록, 중복 등록 거부  \\
+Test-\/02  &\doxylink{struct_topic}{Topic} 등록  &정상 등록, \doxylink{struct_topic}{Topic} 검색  \\
+Test-\/03  &\doxylink{struct_publisher}{Publisher} 등록  &Node/\+Topic 존재 확인, 중복 등록 거부  \\
+Test-\/04  &\doxylink{struct_subscriber}{Subscriber} 등록  &Node/\+Topic 존재 확인, 중복 등록 거부  \\
+Test-\/05  &\doxylink{struct_message}{Message} Publish  &Publisher만 메시지를 발행할 수 있음  \\
+Test-\/06  &\doxylink{struct_message}{Message} Receive  &Subscriber만 메시지를 수신할 수 있음  \\
+Test-\/07  &Priority Queue  &높은 priority 메시지가 먼저 수신됨  \\
+Test-\/08  &Same Priority Order  &같은 priority 메시지는 발행 순서를 유지함  \\
+Test-\/09  &Communication Graph  &publish/subscribe 관계 출력 함수 호출  \\
+Test-\/10  &BFS Path Search  &\doxylink{struct_node}{Node} 간 메시지 전달 경로 탐색 성공/실패  \\
+\end{DoxyTable}
+\hypertarget{md_docs_205__test__plan_autotoc_md55}{}\doxysection{\texorpdfstring{3. 수동 CLI 테스트 시나리오}{3. 수동 CLI 테스트 시나리오}}\label{md_docs_205__test__plan_autotoc_md55}
+\hypertarget{md_docs_205__test__plan_autotoc_md56}{}\doxysubsection{\texorpdfstring{Scenario-\/01. 기본 등록 및 목록 출력}{Scenario-\/01. 기본 등록 및 목록 출력}}\label{md_docs_205__test__plan_autotoc_md56}
+입력\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{add\_node\ lidar\_node}
+\DoxyCodeLine{add\_node\ nav\_node}
+\DoxyCodeLine{add\_topic\ /scan}
+\DoxyCodeLine{add\_publisher\ lidar\_node\ /scan}
+\DoxyCodeLine{add\_subscriber\ nav\_node\ /scan}
+\DoxyCodeLine{list}
+\DoxyCodeLine{exit}
+
+\end{DoxyCode}
+
+
+기대 결과\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily lidar\+\_\+node}, {\ttfamily nav\+\_\+node}가 \doxylink{struct_node}{Node} 목록에 출력된다.
+\item {\ttfamily /scan} \doxylink{struct_topic}{Topic} 아래 \doxylink{struct_publisher}{Publisher} {\ttfamily lidar\+\_\+node}가 출력된다.
+\item {\ttfamily /scan} \doxylink{struct_topic}{Topic} 아래 \doxylink{struct_subscriber}{Subscriber} {\ttfamily nav\+\_\+node}가 출력된다.
+\end{DoxyItemize}\hypertarget{md_docs_205__test__plan_autotoc_md57}{}\doxysubsection{\texorpdfstring{Scenario-\/02. Priority Queue 기반 publish/receive}{Scenario-\/02. Priority Queue 기반 publish/receive}}\label{md_docs_205__test__plan_autotoc_md57}
+입력\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{add\_node\ lidar\_node}
+\DoxyCodeLine{add\_node\ nav\_node}
+\DoxyCodeLine{add\_topic\ /scan}
+\DoxyCodeLine{add\_publisher\ lidar\_node\ /scan}
+\DoxyCodeLine{add\_subscriber\ nav\_node\ /scan}
+\DoxyCodeLine{publish\ lidar\_node\ /scan\ "{}normal\ data"{}\ 1}
+\DoxyCodeLine{publish\ lidar\_node\ /scan\ "{}emergency\ data"{}\ 10}
+\DoxyCodeLine{receive\ nav\_node\ /scan}
+\DoxyCodeLine{receive\ nav\_node\ /scan}
+\DoxyCodeLine{exit}
+
+\end{DoxyCode}
+
+
+기대 결과\+:
+
+
+\begin{DoxyItemize}
+\item 첫 번째 수신 메시지는 {\ttfamily emergency data}, priority {\ttfamily 10}이다.
+\item 두 번째 수신 메시지는 {\ttfamily normal data}, priority {\ttfamily 1}이다.
+\end{DoxyItemize}\hypertarget{md_docs_205__test__plan_autotoc_md58}{}\doxysubsection{\texorpdfstring{Scenario-\/03. Communication Graph 출력}{Scenario-\/03. Communication Graph 출력}}\label{md_docs_205__test__plan_autotoc_md58}
+입력\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{add\_node\ lidar\_node}
+\DoxyCodeLine{add\_node\ nav\_node}
+\DoxyCodeLine{add\_topic\ /scan}
+\DoxyCodeLine{add\_publisher\ lidar\_node\ /scan}
+\DoxyCodeLine{add\_subscriber\ nav\_node\ /scan}
+\DoxyCodeLine{graph}
+\DoxyCodeLine{exit}
+
+\end{DoxyCode}
+
+
+기대 결과\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Communication\ graph:}
+\DoxyCodeLine{\ \ lidar\_node\ -\/>\ /scan}
+\DoxyCodeLine{\ \ /scan\ -\/>\ nav\_node}
+
+\end{DoxyCode}
+\hypertarget{md_docs_205__test__plan_autotoc_md59}{}\doxysubsection{\texorpdfstring{Scenario-\/04. BFS 경로 탐색}{Scenario-\/04. BFS 경로 탐색}}\label{md_docs_205__test__plan_autotoc_md59}
+입력\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{add\_node\ lidar\_node}
+\DoxyCodeLine{add\_node\ nav\_node}
+\DoxyCodeLine{add\_node\ motor\_node}
+\DoxyCodeLine{add\_topic\ /scan}
+\DoxyCodeLine{add\_topic\ /cmd\_vel}
+\DoxyCodeLine{add\_publisher\ lidar\_node\ /scan}
+\DoxyCodeLine{add\_subscriber\ nav\_node\ /scan}
+\DoxyCodeLine{add\_publisher\ nav\_node\ /cmd\_vel}
+\DoxyCodeLine{add\_subscriber\ motor\_node\ /cmd\_vel}
+\DoxyCodeLine{search\ lidar\_node\ motor\_node}
+\DoxyCodeLine{search\ motor\_node\ lidar\_node}
+\DoxyCodeLine{exit}
+
+\end{DoxyCode}
+
+
+기대 결과\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Path\ search:}
+\DoxyCodeLine{\ \ Path\ found:\ lidar\_node\ -\/>\ /scan\ -\/>\ nav\_node\ -\/>\ /cmd\_vel\ -\/>\ motor\_node}
+
+\end{DoxyCode}
+
+
+두 번째 탐색은 방향 그래프상 역방향 경로가 없으므로 다음과 같이 출력된다.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Path\ search:}
+\DoxyCodeLine{\ \ Path\ not\ found.}
+
+\end{DoxyCode}
+\hypertarget{md_docs_205__test__plan_autotoc_md60}{}\doxysection{\texorpdfstring{4. 예외 테스트}{4. 예외 테스트}}\label{md_docs_205__test__plan_autotoc_md60}
+
+\begin{DoxyTable}{2}{}{}{1}
+\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}입력 예시  &\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}기대 결과  \\
+{\ttfamily add\+\_\+node lidar\+\_\+node}를 두 번 실행  &두 번째 등록 실패  \\
+존재하지 않는 Node로 {\ttfamily add\+\_\+publisher} 실행  &등록 실패  \\
+Subscriber가 아닌 Node로 {\ttfamily receive} 실행  &수신 실패  \\
+Publisher가 아닌 Node로 {\ttfamily publish} 실행  &발행 실패  \\
+빈 Queue에서 {\ttfamily receive} 실행  &수신 실패  \\
+잘못된 명령어 입력  &{\ttfamily Unknown command} 또는 사용법 오류 출력  \\
+\end{DoxyTable}

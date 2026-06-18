@@ -1,10 +1,14 @@
 /**
  * @file simulator.h
- * @brief ROS2 Pub/Sub 개념을 C 자료구조로 단순화한 시뮬레이터의 공개 인터페이스.
+ * @brief Public API for a lightweight ROS2-style pub/sub simulator.
  *
- * 이 헤더는 Node, Topic, Publisher, Subscriber, Message, Simulator 자료구조와
- * 시뮬레이터 조작 함수를 선언한다. 실제 ROS2, DDS, RTPS, socket은 사용하지 않고
- * 연결 리스트, priority queue, 그래프 탐색을 통해 통신 구조를 로컬 메모리에서 표현한다.
+ * This header defines the data structures and functions used to model nodes,
+ * topics, publishers, subscribers, queued messages, and communication paths
+ * in a single-process C program.
+ *
+ * The simulator does not use ROS2, DDS, RTPS, sockets, or external networking
+ * libraries. Instead, it represents communication with linked lists, a
+ * per-topic priority queue, and graph-style path traversal.
  */
 
 #ifndef SIMULATOR_H
@@ -13,265 +17,314 @@
 #include <stddef.h>
 
 /**
- * @brief Node, Topic, Message 문자열을 저장하는 고정 길이 버퍼 크기.
+ * @brief Fixed-size buffer length used for node, topic, and message strings.
  */
 #define SIM_NAME_LENGTH 64
 
 typedef struct Message Message;
 
 /**
- * @brief ROS2 Node를 단일 연결 리스트 노드로 표현한 구조체.
+ * @brief A registered node in the simulator.
  *
- * Simulator는 등록된 Node들을 `next` 포인터 기반 연결 리스트로 관리한다.
+ * Nodes are stored in a singly linked list owned by the Simulator.
  */
 typedef struct Node {
-    char name[SIM_NAME_LENGTH]; /**< Node 이름 */
-    struct Node *next; /**< 다음 Node를 가리키는 포인터 */
+    char name[SIM_NAME_LENGTH]; /**< Node name. */
+    struct Node *next; /**< Next node in the registered node list. */
 } Node;
 
 /**
- * @brief ROS2 Topic을 단일 연결 리스트 노드로 표현한 구조체.
+ * @brief A topic registered in the simulator.
  *
- * 각 Topic은 Publisher 리스트, Subscriber 리스트, Message priority queue를 소유한다.
- * `message_head`는 가장 먼저 수신될 Message를 가리키고, `message_tail`은 마지막 Message를 가리킨다.
+ * Each topic owns a publisher list, a subscriber list, and a message queue
+ * ordered by priority.
  */
 typedef struct Topic {
-    char name[SIM_NAME_LENGTH]; /**< Topic 이름 */
-    struct Publisher *publishers; /**< Publisher 연결 리스트의 head 포인터 */
-    struct Subscriber *subscribers; /**< Subscriber 연결 리스트의 head 포인터 */
-    Message *message_head; /**< Message priority queue의 front 포인터 */
-    Message *message_tail; /**< Message priority queue의 rear 포인터 */
-    struct Topic *next; /**< 다음 Topic을 가리키는 포인터 */
+    char name[SIM_NAME_LENGTH]; /**< Topic name. */
+    struct Publisher *publishers; /**< Head of the publisher list for this topic. */
+    struct Subscriber *subscribers; /**< Head of the subscriber list for this topic. */
+    Message *message_head; /**< Front of the per-topic message queue. */
+    Message *message_tail; /**< Rear of the per-topic message queue. */
+    struct Topic *next; /**< Next topic in the registered topic list. */
 } Topic;
 
 /**
- * @brief 특정 Topic에 연결된 Publisher 정보를 표현하는 연결 리스트 노드.
+ * @brief A publisher entry attached to a topic.
  *
- * 실제 Node 포인터를 직접 저장하지 않고, 등록된 Publisher Node의 이름을 저장한다.
+ * The entry stores the publisher node name rather than a direct pointer to a
+ * Node object.
  */
 typedef struct Publisher {
-    char node_name[SIM_NAME_LENGTH]; /**< Publisher로 등록된 Node 이름 */
-    struct Publisher *next; /**< 다음 Publisher를 가리키는 포인터 */
+    char node_name[SIM_NAME_LENGTH]; /**< Name of the registered publisher node. */
+    struct Publisher *next; /**< Next publisher in the topic publisher list. */
 } Publisher;
 
 /**
- * @brief 특정 Topic에 연결된 Subscriber 정보를 표현하는 연결 리스트 노드.
+ * @brief A subscriber entry attached to a topic.
  *
- * 실제 Node 포인터를 직접 저장하지 않고, 등록된 Subscriber Node의 이름을 저장한다.
+ * The entry stores the subscriber node name rather than a direct pointer to a
+ * Node object.
  */
 typedef struct Subscriber {
-    char node_name[SIM_NAME_LENGTH]; /**< Subscriber로 등록된 Node 이름 */
-    struct Subscriber *next; /**< 다음 Subscriber를 가리키는 포인터 */
+    char node_name[SIM_NAME_LENGTH]; /**< Name of the registered subscriber node. */
+    struct Subscriber *next; /**< Next subscriber in the topic subscriber list. */
 } Subscriber;
 
 /**
- * @brief Topic 내부 Message priority queue의 원소를 표현하는 연결 리스트 노드.
+ * @brief A message stored in a topic queue.
  *
- * priority 값이 높은 Message가 queue의 앞쪽에 위치한다.
- * priority 값이 같으면 기존 발행 순서를 유지한다.
+ * Messages are linked together in descending priority order. Messages with the
+ * same priority preserve publish order.
  */
 typedef struct Message {
-    char data[SIM_NAME_LENGTH]; /**< Message 데이터 문자열 */
-    int priority; /**< Message 우선순위 값 */
-    struct Message *next; /**< 다음 Message를 가리키는 포인터 */
+    char data[SIM_NAME_LENGTH]; /**< Message payload string. */
+    int priority; /**< Message priority value. Higher values are delivered first. */
+    struct Message *next; /**< Next message in the topic queue. */
 } Message;
 
 /**
- * @brief 시뮬레이터 전체 상태를 보관하는 최상위 구조체.
+ * @brief Global simulator state.
  *
- * 등록된 Node 리스트와 Topic 리스트의 head 포인터를 보관한다.
- * Topic 내부에는 Publisher, Subscriber, Message priority queue가 포함된다.
+ * A Simulator owns the registered node list and topic list. Each topic in
+ * turn owns its publisher list, subscriber list, and queued messages.
  */
 typedef struct Simulator {
-    Node *nodes; /**< 등록된 Node 연결 리스트의 head 포인터 */
-    Topic *topics; /**< 등록된 Topic 연결 리스트의 head 포인터 */
+    Node *nodes; /**< Head of the registered node list. */
+    Topic *topics; /**< Head of the registered topic list. */
 } Simulator;
 
 /**
- * @brief Simulator 구조체를 빈 상태로 초기화한다.
+ * @brief Initializes a Simulator to the empty state.
  *
- * @param sim 초기화할 Simulator 포인터
+ * @param sim Simulator instance to initialize.
  */
 void simulator_init(Simulator *sim);
 
 /**
- * @brief Simulator가 동적 할당한 모든 자료구조 메모리를 해제한다.
+ * @brief Releases all dynamically allocated state owned by the simulator.
  *
- * Node 리스트, Topic 리스트, 각 Topic 내부의 Publisher 리스트, Subscriber 리스트,
- * Message priority queue를 모두 순회하며 해제한다.
+ * This function frees every registered node, topic, publisher entry,
+ * subscriber entry, and queued message, then resets the simulator to the
+ * empty state.
  *
- * @param sim 해제할 Simulator 포인터
+ * @param sim Simulator instance to destroy.
  */
 void simulator_destroy(Simulator *sim);
 
 /**
- * @brief 새 Node를 Simulator에 등록한다.
+ * @brief Registers a new node in the simulator.
  *
- * Node 이름은 NULL, 빈 문자열, `SIM_NAME_LENGTH` 이상 길이를 가질 수 없다.
- * 같은 이름의 Node는 중복 등록할 수 없다.
+ * The node name must be non-NULL, non-empty, shorter than SIM_NAME_LENGTH,
+ * and unique within the simulator.
  *
- * @param sim Simulator 포인터
- * @param name 등록할 Node 이름
- * @return 등록 성공 시 1, 실패 시 0
+ * @param sim Simulator instance to modify.
+ * @param name Node name to register.
+ * @return 1 if the node was registered successfully, or 0 on failure.
  */
 int simulator_add_node(Simulator *sim, const char *name);
 
 /**
- * @brief 새 Topic을 Simulator에 등록한다.
+ * @brief Registers a new topic in the simulator.
  *
- * Topic 이름은 NULL, 빈 문자열, `SIM_NAME_LENGTH` 이상 길이를 가질 수 없다.
- * 같은 이름의 Topic은 중복 등록할 수 없다.
+ * The topic name must be non-NULL, non-empty, shorter than SIM_NAME_LENGTH,
+ * and unique within the simulator.
  *
- * @param sim Simulator 포인터
- * @param name 등록할 Topic 이름
- * @return 등록 성공 시 1, 실패 시 0
+ * @param sim Simulator instance to modify.
+ * @param name Topic name to register.
+ * @return 1 if the topic was registered successfully, or 0 on failure.
  */
 int simulator_add_topic(Simulator *sim, const char *name);
 
 /**
- * @brief 이름으로 등록된 Node를 탐색한다.
+ * @brief Finds a registered node by name.
  *
- * @param sim Simulator 포인터
- * @param name 찾을 Node 이름
- * @return 찾은 Node 포인터, 없으면 NULL
+ * @param sim Simulator instance.
+ * @param name Node name to search for.
+ * @return A pointer to the matching node, or NULL if not found.
  */
 Node *simulator_find_node(const Simulator *sim, const char *name);
 
 /**
- * @brief 이름으로 등록된 Topic을 탐색한다.
+ * @brief Finds a registered topic by name.
  *
- * @param sim Simulator 포인터
- * @param name 찾을 Topic 이름
- * @return 찾은 Topic 포인터, 없으면 NULL
+ * @param sim Simulator instance.
+ * @param name Topic name to search for.
+ * @return A pointer to the matching topic, or NULL if not found.
  */
 Topic *simulator_find_topic(const Simulator *sim, const char *name);
 
 /**
- * @brief 등록된 Node 목록을 출력한다.
+ * @brief Formats the registered node list into a text buffer.
  *
- * @param sim Simulator 포인터
+ * @param sim Simulator instance.
+ * @param node_buffer Output buffer for the formatted node list.
+ * @param node_buffer_size Size of @p node_buffer in bytes.
+ * @return 1 if formatting succeeds, or 0 if the node list is empty or invalid.
  */
-void simulator_print_nodes(const Simulator *sim);
+int simulator_format_nodes(
+    const Simulator *sim,
+    char *node_buffer,
+    size_t node_buffer_size
+);
 
 /**
- * @brief 등록된 Topic 목록과 각 Topic의 Publisher/Subscriber 목록을 출력한다.
+ * @brief Formats the registered topic list into a text buffer.
  *
- * @param sim Simulator 포인터
+ * The formatted output includes topic names and their publisher/subscriber
+ * relationships.
+ *
+ * @param sim Simulator instance.
+ * @param topic_buffer Output buffer for the formatted topic list.
+ * @param topic_buffer_size Size of @p topic_buffer in bytes.
+ * @return 1 if formatting succeeds, or 0 if the topic list is empty or invalid.
  */
-void simulator_print_topics(const Simulator *sim);
+int simulator_format_topics(
+    const Simulator *sim,
+    char *topic_buffer,
+    size_t topic_buffer_size
+);
 
 /**
- * @brief 등록된 Node와 Topic 관련 목록을 모두 출력한다.
+ * @brief Formats the registered node list and topic list into a text buffer.
  *
- * @param sim Simulator 포인터
+ * @param sim Simulator instance.
+ * @param list_buffer Output buffer for the formatted list text.
+ * @param list_buffer_size Size of @p list_buffer in bytes.
+ * @return 1 if formatting succeeds, or 0 if both lists are empty or invalid.
  */
-void simulator_print_registered_lists(const Simulator *sim);
+int simulator_format_registered_lists(
+    const Simulator *sim,
+    char *list_buffer,
+    size_t list_buffer_size
+);
 
 /**
- * @brief 등록된 publish/subscribe 관계를 Communication Graph 형태로 출력한다.
+ * @brief Formats the communication graph into a text buffer.
  *
- * 각 Topic을 기준으로 Publisher Node에서 Topic으로 향하는 간선과,
- * Topic에서 Subscriber Node로 향하는 간선을 출력한다.
+ * The graph is formatted as directed edges from publisher nodes to topics and
+ * from topics to subscriber nodes, separated by newlines.
  *
- * @param sim Simulator 포인터
+ * @param sim Simulator instance.
+ * @param graph_buffer Output buffer for the formatted graph text.
+ * @param graph_buffer_size Size of @p graph_buffer in bytes.
+ * @return 1 if formatting succeeds, or 0 if the graph cannot be written.
  */
-void simulator_print_communication_graph(const Simulator *sim);
+int simulator_format_communication_graph(
+    const Simulator *sim,
+    char *graph_buffer,
+    size_t graph_buffer_size
+);
 
 /**
- * @brief 특정 Node에서 다른 Node까지 메시지 전달 경로를 BFS로 탐색하고 출력한다.
+ * @brief Builds a directed communication path string between nodes.
  *
- * Publisher Node -> Topic -> Subscriber Node 관계를 방향 그래프로 보고,
- * `start_node_name`에서 `target_node_name`까지 도달 가능한 경로가 있는지 탐색한다.
+ * The search treats publisher-to-topic and topic-to-subscriber relationships
+ * as directed edges and uses breadth-first search (BFS) to find a reachable
+ * path from the start node to the target node.
  *
- * @param sim Simulator 포인터
- * @param start_node_name 시작 Node 이름
- * @param target_node_name 도착 Node 이름
- * @return 경로가 존재하면 1, 존재하지 않거나 입력이 잘못되면 0
+ * On success, the path is written to @p path_buffer in the form:
+ * `node -> topic -> node -> ...`
+ *
+ * @param sim Simulator instance.
+ * @param start_node_name Name of the source node.
+ * @param target_node_name Name of the destination node.
+ * @param path_buffer Output buffer for the formatted path string.
+ * @param path_buffer_size Size of @p path_buffer in bytes.
+ * @return 1 if a path is found and written successfully, or 0 otherwise.
  */
-int simulator_print_path_between_nodes(const Simulator *sim, const char *start_node_name, const char *target_node_name);
+int simulator_format_path_between_nodes(
+    const Simulator *sim,
+    const char *start_node_name,
+    const char *target_node_name,
+    char *path_buffer,
+    size_t path_buffer_size
+);
 
 /**
- * @brief 특정 Node를 특정 Topic의 Publisher로 등록한다.
+ * @brief Registers a node as a publisher for a topic.
  *
- * Node와 Topic은 미리 Simulator에 등록되어 있어야 한다.
- * 같은 Topic에 같은 Node를 Publisher로 중복 등록할 수 없다.
+ * Both the node and topic must already exist. The same node cannot be
+ * registered as a publisher for the same topic more than once.
  *
- * @param sim Simulator 포인터
- * @param node_name Publisher로 등록할 Node 이름
- * @param topic_name Publisher를 등록할 Topic 이름
- * @return 등록 성공 시 1, 실패 시 0
+ * @param sim Simulator instance to modify.
+ * @param node_name Node name to register as a publisher.
+ * @param topic_name Topic name to attach the publisher to.
+ * @return 1 if the publisher was registered successfully, or 0 on failure.
  */
 int simulator_add_publisher(Simulator *sim, const char *node_name, const char *topic_name);
 
 /**
- * @brief 특정 Node를 특정 Topic의 Subscriber로 등록한다.
+ * @brief Registers a node as a subscriber for a topic.
  *
- * Node와 Topic은 미리 Simulator에 등록되어 있어야 한다.
- * 같은 Topic에 같은 Node를 Subscriber로 중복 등록할 수 없다.
+ * Both the node and topic must already exist. The same node cannot be
+ * registered as a subscriber for the same topic more than once.
  *
- * @param sim Simulator 포인터
- * @param node_name Subscriber로 등록할 Node 이름
- * @param topic_name Subscriber를 등록할 Topic 이름
- * @return 등록 성공 시 1, 실패 시 0
+ * @param sim Simulator instance to modify.
+ * @param node_name Node name to register as a subscriber.
+ * @param topic_name Topic name to attach the subscriber to.
+ * @return 1 if the subscriber was registered successfully, or 0 on failure.
  */
 int simulator_add_subscriber(Simulator *sim, const char *node_name, const char *topic_name);
 
 /**
- * @brief Publisher Node가 특정 Topic에 Message를 발행한다.
+ * @brief Publishes a message to a topic.
  *
- * 발행에 성공하면 새 Message 노드를 생성하고 Topic 내부 priority queue에 정렬 삽입한다.
- * priority 값이 높은 Message가 먼저 수신되며, priority 값이 같으면 발행 순서를 유지한다.
+ * The given node must already be registered as a publisher of the target
+ * topic. On success, the message is inserted into the topic queue according
+ * to priority order. Higher-priority messages are received first. Messages
+ * with the same priority preserve publish order.
  *
- * @param sim Simulator 포인터
- * @param node_name Message를 발행할 Publisher Node 이름
- * @param topic_name Message를 발행할 Topic 이름
- * @param message 발행할 Message 데이터
- * @param priority Message 우선순위 값
- * @return 발행 및 queue 저장 성공 시 1, 실패 시 0
+ * @param sim Simulator instance.
+ * @param node_name Publisher node name.
+ * @param topic_name Target topic name.
+ * @param message Message payload.
+ * @param priority Message priority value.
+ * @return 1 on success, or 0 if validation or insertion fails.
  */
 int simulator_publish_message(Simulator *sim, const char *node_name, const char *topic_name, const char *message, int priority);
 
 /**
- * @brief Subscriber Node가 구독 중인 Topic에서 Message를 수신한다.
+ * @brief Receives the next available message from a subscribed topic.
  *
- * 수신에 성공하면 해당 Topic의 priority queue front에 있는 Message를 제거해 반환한다.
+ * The given node must already be registered as a subscriber of the target
+ * topic. On success, this function removes and returns the front message from
+ * the topic queue.
  *
- * @param sim Simulator 포인터
- * @param node_name Message를 수신할 Subscriber Node 이름
- * @param topic_name Message를 수신할 Topic 이름
- * @return 수신한 Message 포인터, 실패하거나 queue가 비어 있으면 NULL
+ * @param sim Simulator instance.
+ * @param node_name Subscriber node name.
+ * @param topic_name Target topic name.
+ * @return A heap-allocated Message on success, or NULL if the request is
+ *         invalid or the queue is empty.
  *
- * @warning 반환된 Message는 queue에서 분리된 동적 할당 객체이다.
- *          호출자는 사용 후 반드시 free() 해야 한다.
+ * @warning The caller owns the returned Message and must free it.
  */
 Message *simulator_receive_message(Simulator *sim, const char *node_name, const char *topic_name);
 
 /**
- * @brief Topic 내부 priority queue의 front Message를 제거하고 반환한다.
+ * @brief Removes and returns the front message from a topic queue.
  *
- * @param topic Message를 꺼낼 Topic 포인터
- * @return 제거된 Message 포인터, queue가 비어 있으면 NULL
+ * @param topic Topic whose queue should be dequeued.
+ * @return The removed Message, or NULL if the queue is empty.
  *
- * @warning 반환된 Message는 queue에서 분리된 동적 할당 객체이다.
- *          호출자는 사용 후 반드시 free() 해야 한다.
+ * @warning The caller owns the returned Message and must free it.
  */
 Message *simulator_dequeue_message(Topic *topic);
 
 /**
- * @brief 특정 Topic에서 node_name에 해당하는 Publisher를 탐색한다.
+ * @brief Finds a publisher entry by node name within a topic.
  *
- * @param topic 탐색할 Topic 포인터
- * @param node_name 찾을 Publisher Node 이름
- * @return 찾은 Publisher 포인터, 없으면 NULL
+ * @param topic Topic to search.
+ * @param node_name Publisher node name to search for.
+ * @return A pointer to the matching publisher entry, or NULL if not found.
  */
 Publisher *simulator_find_publisher(const Topic *topic, const char *node_name);
 
 /**
- * @brief 특정 Topic에서 node_name에 해당하는 Subscriber를 탐색한다.
+ * @brief Finds a subscriber entry by node name within a topic.
  *
- * @param topic 탐색할 Topic 포인터
- * @param node_name 찾을 Subscriber Node 이름
- * @return 찾은 Subscriber 포인터, 없으면 NULL
+ * @param topic Topic to search.
+ * @param node_name Subscriber node name to search for.
+ * @return A pointer to the matching subscriber entry, or NULL if not found.
  */
 Subscriber *simulator_find_subscriber(const Topic *topic, const char *node_name);
 

@@ -1,0 +1,89 @@
+\doxysection{simulator.\+h}
+\hypertarget{simulator_8h_source}{}\label{simulator_8h_source}\index{include/simulator.h@{include/simulator.h}}
+\mbox{\hyperlink{simulator_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00014}00014\ \textcolor{preprocessor}{\#ifndef\ SIMULATOR\_H}}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00015}00015\ \textcolor{preprocessor}{\#define\ SIMULATOR\_H}}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00022}\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{00022}}\ \textcolor{preprocessor}{\#define\ SIM\_NAME\_LENGTH\ 64}}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00024}\mbox{\hyperlink{simulator_8h_a82fffef6ac8d8a796ab35b7d6a7a0dcb}{00024}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_message}{Message}}\ \mbox{\hyperlink{struct_message}{Message}};}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00031}\mbox{\hyperlink{struct_node}{00031}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_node}{Node}}\ \{}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00032}\mbox{\hyperlink{struct_node_ad67a57edf18db3855ef772ad8b3f06bf}{00032}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_node_ad67a57edf18db3855ef772ad8b3f06bf}{name}}[\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\_NAME\_LENGTH}}];\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00033}\mbox{\hyperlink{struct_node_af67b110ca1a258b793bf69d306929b22}{00033}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_node}{Node}}\ *\mbox{\hyperlink{struct_node_af67b110ca1a258b793bf69d306929b22}{next}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00034}\mbox{\hyperlink{simulator_8h_a3b09f37e675bcd48a01bf22155996872}{00034}}\ \}\ \mbox{\hyperlink{struct_node}{Node}};}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00042}\mbox{\hyperlink{struct_topic}{00042}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_topic}{Topic}}\ \{}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00043}\mbox{\hyperlink{struct_topic_a2c5d9cac1084145b12541325fc18da64}{00043}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_topic_a2c5d9cac1084145b12541325fc18da64}{name}}[\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\_NAME\_LENGTH}}];\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00044}\mbox{\hyperlink{struct_topic_a5e561131bcfd03b16dcbae33880445fd}{00044}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_publisher}{Publisher}}\ *\mbox{\hyperlink{struct_topic_a5e561131bcfd03b16dcbae33880445fd}{publishers}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00045}\mbox{\hyperlink{struct_topic_aebbbac14fb4a11da4093f98f02e4f628}{00045}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_subscriber}{Subscriber}}\ *\mbox{\hyperlink{struct_topic_aebbbac14fb4a11da4093f98f02e4f628}{subscribers}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00046}\mbox{\hyperlink{struct_topic_a270797d41239cad5d4d9fea4d17960ce}{00046}}\ \ \ \ \ \mbox{\hyperlink{struct_message}{Message}}\ *\mbox{\hyperlink{struct_topic_a270797d41239cad5d4d9fea4d17960ce}{message\_head}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00047}\mbox{\hyperlink{struct_topic_a5afd42b2c75c16cff73a025aadc121c4}{00047}}\ \ \ \ \ \mbox{\hyperlink{struct_message}{Message}}\ *\mbox{\hyperlink{struct_topic_a5afd42b2c75c16cff73a025aadc121c4}{message\_tail}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00048}\mbox{\hyperlink{struct_topic_a299e6ca71718ba47817c95151bfff54d}{00048}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_topic}{Topic}}\ *\mbox{\hyperlink{struct_topic_a299e6ca71718ba47817c95151bfff54d}{next}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00049}\mbox{\hyperlink{simulator_8h_a1947247736467189077e9aeccc4eec5d}{00049}}\ \}\ \mbox{\hyperlink{struct_topic}{Topic}};}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00057}\mbox{\hyperlink{struct_publisher}{00057}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_publisher}{Publisher}}\ \{}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00058}\mbox{\hyperlink{struct_publisher_a223f4ea6e642badb17f352b578130206}{00058}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_publisher_a223f4ea6e642badb17f352b578130206}{node\_name}}[\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\_NAME\_LENGTH}}];\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00059}\mbox{\hyperlink{struct_publisher_a2ca2f96a13d354b18f87039ae86bb0e0}{00059}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_publisher}{Publisher}}\ *\mbox{\hyperlink{struct_publisher_a2ca2f96a13d354b18f87039ae86bb0e0}{next}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00060}\mbox{\hyperlink{simulator_8h_af0a9e2bbfc821bae3089192cc0232b78}{00060}}\ \}\ \mbox{\hyperlink{struct_publisher}{Publisher}};}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00068}\mbox{\hyperlink{struct_subscriber}{00068}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_subscriber}{Subscriber}}\ \{}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00069}\mbox{\hyperlink{struct_subscriber_afc37a0e4e2295cc796b9908b4f17cf2b}{00069}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_subscriber_afc37a0e4e2295cc796b9908b4f17cf2b}{node\_name}}[\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\_NAME\_LENGTH}}];\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00070}\mbox{\hyperlink{struct_subscriber_a327bc55516213b6b0a5a9989e5f54f0f}{00070}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_subscriber}{Subscriber}}\ *\mbox{\hyperlink{struct_subscriber_a327bc55516213b6b0a5a9989e5f54f0f}{next}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00071}\mbox{\hyperlink{simulator_8h_a32b99b996893d7b75ac28063611cae89}{00071}}\ \}\ \mbox{\hyperlink{struct_subscriber}{Subscriber}};}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00079}\mbox{\hyperlink{struct_message}{00079}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_message}{Message}}\ \{}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00080}\mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{00080}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{data}}[\mbox{\hyperlink{simulator_8h_a30fe70f6397b7b942c027fbfb0afa58d}{SIM\_NAME\_LENGTH}}];\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00081}\mbox{\hyperlink{struct_message_ad16455c5b24b2b45b47ca36b5c69fd1f}{00081}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_message_ad16455c5b24b2b45b47ca36b5c69fd1f}{priority}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00082}\mbox{\hyperlink{struct_message_a1b2466aae055c5bff9df1ad6124de470}{00082}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_message}{Message}}\ *\mbox{\hyperlink{struct_message_a1b2466aae055c5bff9df1ad6124de470}{next}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00083}00083\ \}\ \mbox{\hyperlink{struct_message}{Message}};}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00091}\mbox{\hyperlink{struct_simulator}{00091}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_simulator}{Simulator}}\ \{}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00092}\mbox{\hyperlink{struct_simulator_a241defef8b02e1ee5b7b940296f5aeee}{00092}}\ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}\ *\mbox{\hyperlink{struct_simulator_a241defef8b02e1ee5b7b940296f5aeee}{nodes}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00093}\mbox{\hyperlink{struct_simulator_a5ce06cd412147d627a199953db586b16}{00093}}\ \ \ \ \ \mbox{\hyperlink{struct_topic}{Topic}}\ *\mbox{\hyperlink{struct_simulator_a5ce06cd412147d627a199953db586b16}{topics}};\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00094}\mbox{\hyperlink{simulator_8h_adf3966c617382991dd7cd2050a01ebe3}{00094}}\ \}\ \mbox{\hyperlink{struct_simulator}{Simulator}};}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00101}00101\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{simulator_8h_ae9580b0ea7fa8f29694b7ac651463ef7}{simulator\_init}}(\mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00112}00112\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{simulator_8h_ac0e87a2b6604fe4e9d9ffe591ab04a71}{simulator\_destroy}}(\mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00124}00124\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simulator_8h_a31ecfdea555869969dc43a38c9f5ead1}{simulator\_add\_node}}(\mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00136}00136\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simulator_8h_a08ba4e9035c3aa9fbc9ed3f0dd29266c}{simulator\_add\_topic}}(\mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00145}00145\ \mbox{\hyperlink{struct_node}{Node}}\ *\mbox{\hyperlink{simulator_8h_a930ba0fa15f14121eff57fe9cf050544}{simulator\_find\_node}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00154}00154\ \mbox{\hyperlink{struct_topic}{Topic}}\ *\mbox{\hyperlink{simulator_8h_ad0addd7400fc19f42d5e1654a9ef9d10}{simulator\_find\_topic}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00161}00161\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{simulator_8h_aceb2a27108c5e83711efc923b6bcb045}{simulator\_print\_nodes}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00168}00168\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{simulator_8h_af664a36ce2716625c82c5c74827b1db9}{simulator\_print\_topics}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00175}00175\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{simulator_8h_a42938682d138be1faf5ff0d255073d6e}{simulator\_print\_registered\_lists}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00185}00185\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{simulator_8h_a562c5e4ffda40014d346e56057c4adeb}{simulator\_print\_communication\_graph}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00199}00199\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simulator_8h_a11c4dd9744226b0608aa5bd4d687a4bf}{simulator\_print\_path\_between\_nodes}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *start\_node\_name,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *target\_node\_name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00212}00212\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simulator_8h_ae7ed880ec4b5f5c311548c4a8d964496}{simulator\_add\_publisher}}(\mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *node\_name,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *topic\_name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00225}00225\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simulator_8h_af209a797cc08feca008caccde5fb919b}{simulator\_add\_subscriber}}(\mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *node\_name,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *topic\_name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00242}00242\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *node\_name,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *topic\_name,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ priority);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00259}00259\ \mbox{\hyperlink{struct_message}{Message}}\ *\mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\mbox{\hyperlink{struct_simulator}{Simulator}}\ *sim,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *node\_name,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *topic\_name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00269}00269\ \mbox{\hyperlink{struct_message}{Message}}\ *\mbox{\hyperlink{simulator_8h_a9418f204ce7282f5beae2089426b8427}{simulator\_dequeue\_message}}(\mbox{\hyperlink{struct_topic}{Topic}}\ *topic);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00278}00278\ \mbox{\hyperlink{struct_publisher}{Publisher}}\ *\mbox{\hyperlink{simulator_8h_a7ae4c0a5fd78a5d32d9f3a27dc2fbc77}{simulator\_find\_publisher}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_topic}{Topic}}\ *topic,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *node\_name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00287}00287\ \mbox{\hyperlink{struct_subscriber}{Subscriber}}\ *\mbox{\hyperlink{simulator_8h_a218a5def83f8ca10d55e1526dd60fd8c}{simulator\_find\_subscriber}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_topic}{Topic}}\ *topic,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *node\_name);}
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{simulator_8h_source_l00289}00289\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

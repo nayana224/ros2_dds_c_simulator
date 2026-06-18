@@ -1,0 +1,61 @@
+\doxysection{Simulator Struct Reference}
+\hypertarget{struct_simulator}{}\label{struct_simulator}\index{Simulator@{Simulator}}
+
+
+Global simulator state.  
+
+
+
+
+{\ttfamily \#include $<$simulator.\+h$>$}
+
+
+
+Collaboration diagram for Simulator\+:
+% FIG 0
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_node}{Node}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_simulator_a241defef8b02e1ee5b7b940296f5aeee}{nodes}}
+\item 
+\mbox{\hyperlink{struct_topic}{Topic}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_simulator_a5ce06cd412147d627a199953db586b16}{topics}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Global simulator state. 
+
+A \doxylink{struct_simulator}{Simulator} owns the registered node list and topic list. Each topic in turn owns its publisher list, subscriber list, and queued messages. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00091}{91}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+
+
+\label{doc-variable-members}
+\Hypertarget{struct_simulator_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_simulator_a241defef8b02e1ee5b7b940296f5aeee}\index{Simulator@{Simulator}!nodes@{nodes}}
+\index{nodes@{nodes}!Simulator@{Simulator}}
+\doxysubsubsection{\texorpdfstring{nodes}{nodes}}
+{\footnotesize\ttfamily \label{struct_simulator_a241defef8b02e1ee5b7b940296f5aeee} 
+\mbox{\hyperlink{struct_node}{Node}}\texorpdfstring{$\ast$}{*} Simulator\+::nodes}
+
+Head of the registered node list. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00092}{92}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+\Hypertarget{struct_simulator_a5ce06cd412147d627a199953db586b16}\index{Simulator@{Simulator}!topics@{topics}}
+\index{topics@{topics}!Simulator@{Simulator}}
+\doxysubsubsection{\texorpdfstring{topics}{topics}}
+{\footnotesize\ttfamily \label{struct_simulator_a5ce06cd412147d627a199953db586b16} 
+\mbox{\hyperlink{struct_topic}{Topic}}\texorpdfstring{$\ast$}{*} Simulator\+::topics}
+
+Head of the registered topic list. 
+
+Definition at line \mbox{\hyperlink{simulator_8h_source_l00093}{93}} of file \mbox{\hyperlink{simulator_8h_source}{simulator.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\mbox{\hyperlink{simulator_8h}{simulator.\+h}}\end{DoxyCompactItemize}

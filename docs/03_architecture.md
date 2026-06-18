@@ -1,31 +1,105 @@
-# 03. 시스템 아키텍처
+# 03. Architecture
 
-## 1. 전체 구조
+## 1. Overall structure
 
+```text
 User Command
-    ↓
+    ->
+CLI Layer
+    ->
 Simulator Core
-    ↓
-Node Manager / Topic Manager / Message Queue / Communication Graph
+    ->
+Registry / Message Queue / Graph Logic
+```
 
-## 2. 데이터 흐름
+## 2. Layer responsibilities
 
-1. 사용자가 Node를 등록한다.
-2. 사용자가 Topic을 등록한다.
-3. Node를 Publisher 또는 Subscriber로 연결한다.
-4. Publisher가 Topic에 Message를 발행한다.
-5. Topic은 Message를 Queue에 저장한다.
-6. Subscriber는 Topic Queue에서 Message를 수신한다.
-7. Graph는 Node 간 통신 관계를 저장하고 탐색한다.
+### CLI layer
 
-## 3. ROS2 개념과의 대응
+Handled by `src/cli.c`.
 
-| ROS2 개념 | 본 프로젝트의 단순화 구현 |
+Responsibilities:
+
+- read commands from standard input
+- tokenize and validate command arguments
+- call simulator APIs
+- print user-facing success, failure, and query output
+
+### Simulator core
+
+Handled by the simulator source files.
+
+Responsibilities:
+
+- manage simulator state
+- apply registration rules
+- maintain message queue ordering
+- compute graph relationships
+- search reachable paths between nodes
+
+## 3. File-level responsibility split
+
+### `src/main.c`
+
+- program entry point
+- initializes the simulator
+- runs the CLI
+- destroys simulator state before exit
+
+### `src/simulator_lifecycle.c`
+
+- simulator initialization
+- simulator destruction
+- nested memory cleanup
+
+### `src/simulator_registry.c`
+
+- node registration and lookup
+- topic registration and lookup
+- publisher/subscriber registration
+- shared name validation
+
+### `src/simulator_message.c`
+
+- message allocation
+- priority queue insertion
+- dequeue behavior
+- publish/receive logic
+
+### `src/simulator_graph.c`
+
+- node/topic list formatting
+- communication graph formatting
+- BFS path search
+
+### `include/simulator_internal.h`
+
+- internal helper declarations shared across simulator implementation files
+
+## 4. Data flow
+
+1. The user enters a command in the CLI.
+2. The CLI parses and validates the command shape.
+3. The CLI calls the corresponding simulator API.
+4. The simulator updates internal data structures or builds query results.
+5. The CLI prints the final user-facing output.
+
+## 5. Mapping to ROS2 concepts
+
+| ROS2 concept | This project |
 |---|---|
-| Node | Node 구조체 |
-| Topic | Topic 구조체 |
-| Publisher | Topic 내부 Publisher List |
-| Subscriber | Topic 내부 Subscriber List |
-| DDS Message Queue | Topic 내부 MessageQueue |
-| QoS Priority | priority 기반 Message 정렬 |
-| ROS Graph | Graph adjacency list |
+| Node | `Node` structure |
+| Topic | `Topic` structure |
+| Publisher | Topic-attached publisher list |
+| Subscriber | Topic-attached subscriber list |
+| DDS message queue | Per-topic message queue |
+| QoS priority | Priority-based queue ordering |
+| ROS graph | Publisher/topic/subscriber relationship graph |
+
+## 6. Current architectural note
+
+The project now has a clearer responsibility split than the original
+single-file simulator core. Recent refactoring also moved the `list`,
+`graph`, and `search` command flow closer to a cleaner boundary:
+the simulator core builds formatted results, and the CLI is responsible for
+printing them to the user.

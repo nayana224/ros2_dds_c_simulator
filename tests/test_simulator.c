@@ -18,6 +18,8 @@ int main(void) {
     Simulator sim;
     Message *message;
     Topic *topic;
+    char graph_buffer[1024];
+    char path_buffer[512];
     int ok = 1;
 
     simulator_init(&sim);
@@ -53,8 +55,12 @@ int main(void) {
         "subscriber registration fails when node does not exist");
     ok &= assert_true(simulator_add_subscriber(&sim, "nav_node", "/missing") == 0,
         "subscriber registration fails when topic does not exist");
-    simulator_print_communication_graph(&sim);
-    ok &= assert_true(1, "FR-09 communication graph print is callable");
+    ok &= assert_true(
+        simulator_format_communication_graph(&sim, graph_buffer, sizeof(graph_buffer)) == 1,
+        "FR-09 communication graph formatting succeeds");
+    ok &= assert_true(
+        strcmp(graph_buffer, "  lidar_node -> /scan\n  /scan -> nav_node\n") == 0,
+        "FR-09 communication graph content is correct");
 
     ok &= assert_true(simulator_add_node(&sim, "motor_node") == 1,
         "third node registration succeeds");
@@ -64,9 +70,24 @@ int main(void) {
         "second publisher registration succeeds");
     ok &= assert_true(simulator_add_subscriber(&sim, "motor_node", "/cmd_vel") == 1,
         "second subscriber registration succeeds");
-    ok &= assert_true(simulator_print_path_between_nodes(&sim, "lidar_node", "motor_node") == 1,
+    ok &= assert_true(
+        simulator_format_path_between_nodes(
+            &sim,
+            "lidar_node",
+            "motor_node",
+            path_buffer,
+            sizeof(path_buffer)) == 1,
         "FR-10 BFS path search succeeds");
-    ok &= assert_true(simulator_print_path_between_nodes(&sim, "motor_node", "lidar_node") == 0,
+    ok &= assert_true(
+        strcmp(path_buffer, "lidar_node -> /scan -> nav_node -> /cmd_vel -> motor_node") == 0,
+        "FR-10 BFS path content is correct");
+    ok &= assert_true(
+        simulator_format_path_between_nodes(
+            &sim,
+            "motor_node",
+            "lidar_node",
+            path_buffer,
+            sizeof(path_buffer)) == 0,
         "FR-10 BFS path search fails when directed path does not exist");
 
     ok &= assert_true(simulator_publish_message(&sim, "lidar_node", "/scan", "range data", 5) == 1,

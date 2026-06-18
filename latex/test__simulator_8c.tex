@@ -1,0 +1,169 @@
+\doxysection{tests/test\+\_\+simulator.c File Reference}
+\hypertarget{test__simulator_8c}{}\label{test__simulator_8c}\index{tests/test\_simulator.c@{tests/test\_simulator.c}}
+{\ttfamily \#include "{}simulator.\+h"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+Include dependency graph for test\+\_\+simulator.\+c\+:
+% FIG 0
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{test__simulator_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\label{doc-func-members}
+\Hypertarget{test__simulator_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{test__simulator_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{test\_simulator.c@{test\_simulator.c}!main@{main}}
+\index{main@{main}!test\_simulator.c@{test\_simulator.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{test__simulator_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__simulator_8c_source_l00017}{17}} of file \mbox{\hyperlink{test__simulator_8c_source}{test\+\_\+simulator.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{struct_simulator}{Simulator}}\ sim;}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{struct_message}{Message}}\ *message;}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{struct_topic}{Topic}}\ *topic;}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{int}\ ok\ =\ 1;}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{simulator_8h_ae9580b0ea7fa8f29694b7ac651463ef7}{simulator\_init}}(\&sim);}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a31ecfdea555869969dc43a38c9f5ead1}{simulator\_add\_node}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}})\ ==\ 1,}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/01\ node\ registration\ succeeds"{}});}
+\DoxyCodeLine{00027\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a08ba4e9035c3aa9fbc9ed3f0dd29266c}{simulator\_add\_topic}}(\&sim,\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ 1,}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/02\ topic\ registration\ succeeds"{}});}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_ae7ed880ec4b5f5c311548c4a8d964496}{simulator\_add\_publisher}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ 1,}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/03\ publisher\ registration\ succeeds"{}});}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ topic\ =\ \mbox{\hyperlink{simulator_8h_ad0addd7400fc19f42d5e1654a9ef9d10}{simulator\_find\_topic}}(\&sim,\ \textcolor{stringliteral}{"{}/scan"{}});}
+\DoxyCodeLine{00034\ \ \ \ \ ok\ \&=\ assert\_true(topic\ !=\ NULL,\ \textcolor{stringliteral}{"{}topic\ can\ be\ found\ for\ publisher\ check"{}});}
+\DoxyCodeLine{00035\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7ae4c0a5fd78a5d32d9f3a27dc2fbc77}{simulator\_find\_publisher}}(topic,\ \textcolor{stringliteral}{"{}lidar\_node"{}})\ !=\ NULL,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}registered\ publisher\ can\ be\ found"{}});}
+\DoxyCodeLine{00037\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_ae7ed880ec4b5f5c311548c4a8d964496}{simulator\_add\_publisher}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ 0,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}duplicate\ publisher\ registration\ is\ rejected"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_ae7ed880ec4b5f5c311548c4a8d964496}{simulator\_add\_publisher}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ 0,}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}publisher\ registration\ fails\ when\ node\ does\ not\ exist"{}});}
+\DoxyCodeLine{00041\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_ae7ed880ec4b5f5c311548c4a8d964496}{simulator\_add\_publisher}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/missing"{}})\ ==\ 0,}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}publisher\ registration\ fails\ when\ topic\ does\ not\ exist"{}});}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a31ecfdea555869969dc43a38c9f5ead1}{simulator\_add\_node}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}})\ ==\ 1,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}second\ node\ registration\ succeeds"{}});}
+\DoxyCodeLine{00046\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_af209a797cc08feca008caccde5fb919b}{simulator\_add\_subscriber}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ 1,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/04\ subscriber\ registration\ succeeds"{}});}
+\DoxyCodeLine{00048\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a218a5def83f8ca10d55e1526dd60fd8c}{simulator\_find\_subscriber}}(topic,\ \textcolor{stringliteral}{"{}nav\_node"{}})\ !=\ NULL,}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}registered\ subscriber\ can\ be\ found"{}});}
+\DoxyCodeLine{00050\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_af209a797cc08feca008caccde5fb919b}{simulator\_add\_subscriber}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ 0,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}duplicate\ subscriber\ registration\ is\ rejected"{}});}
+\DoxyCodeLine{00052\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_af209a797cc08feca008caccde5fb919b}{simulator\_add\_subscriber}}(\&sim,\ \textcolor{stringliteral}{"{}ghost\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ 0,}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}subscriber\ registration\ fails\ when\ node\ does\ not\ exist"{}});}
+\DoxyCodeLine{00054\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_af209a797cc08feca008caccde5fb919b}{simulator\_add\_subscriber}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/missing"{}})\ ==\ 0,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}subscriber\ registration\ fails\ when\ topic\ does\ not\ exist"{}});}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{simulator_8h_a562c5e4ffda40014d346e56057c4adeb}{simulator\_print\_communication\_graph}}(\&sim);}
+\DoxyCodeLine{00057\ \ \ \ \ ok\ \&=\ assert\_true(1,\ \textcolor{stringliteral}{"{}FR-\/09\ communication\ graph\ print\ is\ callable"{}});}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a31ecfdea555869969dc43a38c9f5ead1}{simulator\_add\_node}}(\&sim,\ \textcolor{stringliteral}{"{}motor\_node"{}})\ ==\ 1,}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}third\ node\ registration\ succeeds"{}});}
+\DoxyCodeLine{00061\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a08ba4e9035c3aa9fbc9ed3f0dd29266c}{simulator\_add\_topic}}(\&sim,\ \textcolor{stringliteral}{"{}/cmd\_vel"{}})\ ==\ 1,}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}second\ topic\ registration\ succeeds"{}});}
+\DoxyCodeLine{00063\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_ae7ed880ec4b5f5c311548c4a8d964496}{simulator\_add\_publisher}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/cmd\_vel"{}})\ ==\ 1,}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}second\ publisher\ registration\ succeeds"{}});}
+\DoxyCodeLine{00065\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_af209a797cc08feca008caccde5fb919b}{simulator\_add\_subscriber}}(\&sim,\ \textcolor{stringliteral}{"{}motor\_node"{}},\ \textcolor{stringliteral}{"{}/cmd\_vel"{}})\ ==\ 1,}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}second\ subscriber\ registration\ succeeds"{}});}
+\DoxyCodeLine{00067\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a11c4dd9744226b0608aa5bd4d687a4bf}{simulator\_print\_path\_between\_nodes}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}motor\_node"{}})\ ==\ 1,}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/10\ BFS\ path\ search\ succeeds"{}});}
+\DoxyCodeLine{00069\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a11c4dd9744226b0608aa5bd4d687a4bf}{simulator\_print\_path\_between\_nodes}}(\&sim,\ \textcolor{stringliteral}{"{}motor\_node"{}},\ \textcolor{stringliteral}{"{}lidar\_node"{}})\ ==\ 0,}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/10\ BFS\ path\ search\ fails\ when\ directed\ path\ does\ not\ exist"{}});}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}range\ data"{}},\ 5)\ ==\ 1,}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/05\ message\ publish\ succeeds"{}});}
+\DoxyCodeLine{00074\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}second\ data"{}},\ 3)\ ==\ 1,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}second\ message\ publish\ succeeds"{}});}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ message\ =\ \mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}});}
+\DoxyCodeLine{00078\ \ \ \ \ ok\ \&=\ assert\_true(message\ !=\ NULL,\ \textcolor{stringliteral}{"{}first\ queued\ message\ exists"{}});}
+\DoxyCodeLine{00079\ \ \ \ \ ok\ \&=\ assert\_true(strcmp(message-\/>\mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{data}},\ \textcolor{stringliteral}{"{}range\ data"{}})\ ==\ 0,}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/07\ subscriber\ receives\ queued\ message"{}});}
+\DoxyCodeLine{00081\ \ \ \ \ free(message);}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ message\ =\ \mbox{\hyperlink{simulator_8h_a9418f204ce7282f5beae2089426b8427}{simulator\_dequeue\_message}}(topic);}
+\DoxyCodeLine{00084\ \ \ \ \ ok\ \&=\ assert\_true(message\ !=\ NULL,\ \textcolor{stringliteral}{"{}second\ queued\ message\ exists"{}});}
+\DoxyCodeLine{00085\ \ \ \ \ ok\ \&=\ assert\_true(strcmp(message-\/>\mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{data}},\ \textcolor{stringliteral}{"{}second\ data"{}})\ ==\ 0,}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}second\ queued\ message\ remains\ after\ first\ receive"{}});}
+\DoxyCodeLine{00087\ \ \ \ \ free(message);}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a9418f204ce7282f5beae2089426b8427}{simulator\_dequeue\_message}}(topic)\ ==\ NULL,}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}queue\ is\ empty\ after\ dequeuing\ all\ messages"{}});}
+\DoxyCodeLine{00091\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ NULL,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}message\ receive\ fails\ when\ queue\ is\ empty"{}});}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}third\ data"{}},\ 1)\ ==\ 1,}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}third\ message\ publish\ succeeds"{}});}
+\DoxyCodeLine{00096\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}})\ ==\ NULL,}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}message\ receive\ fails\ when\ node\ is\ not\ a\ subscriber"{}});}
+\DoxyCodeLine{00098\ \ \ \ \ message\ =\ \mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}});}
+\DoxyCodeLine{00099\ \ \ \ \ ok\ \&=\ assert\_true(message\ !=\ NULL,\ \textcolor{stringliteral}{"{}subscriber\ can\ still\ receive\ after\ failed\ receiver\ attempt"{}});}
+\DoxyCodeLine{00100\ \ \ \ \ ok\ \&=\ assert\_true(strcmp(message-\/>\mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{data}},\ \textcolor{stringliteral}{"{}third\ data"{}})\ ==\ 0,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failed\ receiver\ attempt\ does\ not\ dequeue\ message"{}});}
+\DoxyCodeLine{00102\ \ \ \ \ free(message);}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}normal\ data"{}},\ 1)\ ==\ 1,}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}normal\ priority\ message\ publish\ succeeds"{}});}
+\DoxyCodeLine{00106\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}emergency\ data"{}},\ 10)\ ==\ 1,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}high\ priority\ message\ publish\ succeeds"{}});}
+\DoxyCodeLine{00108\ \ \ \ \ message\ =\ \mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}});}
+\DoxyCodeLine{00109\ \ \ \ \ ok\ \&=\ assert\_true(message\ !=\ NULL,\ \textcolor{stringliteral}{"{}FR-\/08\ high\ priority\ message\ exists"{}});}
+\DoxyCodeLine{00110\ \ \ \ \ ok\ \&=\ assert\_true(strcmp(message-\/>\mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{data}},\ \textcolor{stringliteral}{"{}emergency\ data"{}})\ ==\ 0,}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FR-\/08\ high\ priority\ message\ is\ received\ before\ lower\ priority\ message"{}});}
+\DoxyCodeLine{00112\ \ \ \ \ free(message);}
+\DoxyCodeLine{00113\ \ \ \ \ message\ =\ \mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}});}
+\DoxyCodeLine{00114\ \ \ \ \ ok\ \&=\ assert\_true(message\ !=\ NULL,\ \textcolor{stringliteral}{"{}normal\ priority\ message\ exists\ after\ high\ priority\ receive"{}});}
+\DoxyCodeLine{00115\ \ \ \ \ ok\ \&=\ assert\_true(strcmp(message-\/>\mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{data}},\ \textcolor{stringliteral}{"{}normal\ data"{}})\ ==\ 0,}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}lower\ priority\ message\ remains\ queued\ after\ high\ priority\ receive"{}});}
+\DoxyCodeLine{00117\ \ \ \ \ free(message);}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}same\ priority\ first"{}},\ 4)\ ==\ 1,}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}first\ same-\/priority\ message\ publish\ succeeds"{}});}
+\DoxyCodeLine{00121\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}same\ priority\ second"{}},\ 4)\ ==\ 1,}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}second\ same-\/priority\ message\ publish\ succeeds"{}});}
+\DoxyCodeLine{00123\ \ \ \ \ message\ =\ \mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}});}
+\DoxyCodeLine{00124\ \ \ \ \ ok\ \&=\ assert\_true(message\ !=\ NULL,\ \textcolor{stringliteral}{"{}first\ same-\/priority\ message\ exists"{}});}
+\DoxyCodeLine{00125\ \ \ \ \ ok\ \&=\ assert\_true(strcmp(message-\/>\mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{data}},\ \textcolor{stringliteral}{"{}same\ priority\ first"{}})\ ==\ 0,}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}same\ priority\ messages\ keep\ FIFO\ order"{}});}
+\DoxyCodeLine{00127\ \ \ \ \ free(message);}
+\DoxyCodeLine{00128\ \ \ \ \ message\ =\ \mbox{\hyperlink{simulator_8h_aa97bcd401e27af25d7ceab86ba8d64fc}{simulator\_receive\_message}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}});}
+\DoxyCodeLine{00129\ \ \ \ \ ok\ \&=\ assert\_true(message\ !=\ NULL,\ \textcolor{stringliteral}{"{}second\ same-\/priority\ message\ exists"{}});}
+\DoxyCodeLine{00130\ \ \ \ \ ok\ \&=\ assert\_true(strcmp(message-\/>\mbox{\hyperlink{struct_message_ade625e56a43022dc0ea34a73699925e9}{data}},\ \textcolor{stringliteral}{"{}same\ priority\ second"{}})\ ==\ 0,}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}second\ same-\/priority\ message\ is\ received\ after\ first"{}});}
+\DoxyCodeLine{00132\ \ \ \ \ free(message);}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}nav\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}range\ data"{}},\ 5)\ ==\ 0,}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}message\ publish\ fails\ when\ node\ is\ not\ a\ publisher"{}});}
+\DoxyCodeLine{00136\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/missing"{}},\ \textcolor{stringliteral}{"{}range\ data"{}},\ 5)\ ==\ 0,}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}message\ publish\ fails\ when\ topic\ does\ not\ exist"{}});}
+\DoxyCodeLine{00138\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a7f2b4cd17c7c7b236d98b0ea97f5ba37}{simulator\_publish\_message}}(\&sim,\ \textcolor{stringliteral}{"{}lidar\_node"{}},\ \textcolor{stringliteral}{"{}/scan"{}},\ \textcolor{stringliteral}{"{}"{}},\ 5)\ ==\ 0,}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}message\ publish\ fails\ when\ message\ is\ empty"{}});}
+\DoxyCodeLine{00140\ \ \ \ \ ok\ \&=\ assert\_true(\mbox{\hyperlink{simulator_8h_a9418f204ce7282f5beae2089426b8427}{simulator\_dequeue\_message}}(topic)\ ==\ NULL,}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failed\ message\ publishes\ do\ not\ enqueue\ messages"{}});}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{simulator_8h_ac0e87a2b6604fe4e9d9ffe591ab04a71}{simulator\_destroy}}(\&sim);}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{keywordflow}{if}\ (!ok)\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00147\ \ \ \ \ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ printf(\textcolor{stringliteral}{"{}All\ requested\ FR-\/01/FR-\/02/FR-\/03/FR-\/04/FR-\/05/FR-\/06/FR-\/07/FR-\/08/FR-\/09/FR-\/10\ tests\ passed.\(\backslash\)n"{}});}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00151\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 1

@@ -1,0 +1,40 @@
+\chapter{06. 복잡도 분석 }
+\hypertarget{md_docs_206__complexity__analysis}{}\label{md_docs_206__complexity__analysis}\index{06. 복잡도 분석@{06. 복잡도 분석}}
+\label{md_docs_206__complexity__analysis_autotoc_md61}%
+\Hypertarget{md_docs_206__complexity__analysis_autotoc_md61}%
+\hypertarget{md_docs_206__complexity__analysis_autotoc_md62}{}\doxysection{\texorpdfstring{1. 기호 정의}{1. 기호 정의}}\label{md_docs_206__complexity__analysis_autotoc_md62}
+
+\begin{DoxyTable}{2}{}{}{1}
+\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}기호  &\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}의미  \\
+N  &등록된 \doxylink{struct_node}{Node} 수  \\
+T  &등록된 \doxylink{struct_topic}{Topic} 수  \\
+P  &특정 Topic에 등록된 \doxylink{struct_publisher}{Publisher} 수  \\
+S  &특정 Topic에 등록된 \doxylink{struct_subscriber}{Subscriber} 수  \\
+M  &특정 Topic에 저장된 \doxylink{struct_message}{Message} 수  \\
+V  &그래프 탐색에서의 정점 수, 현재 구현에서는 \doxylink{struct_node}{Node} 수  \\
+E  &그래프 탐색에서의 간선 수, \doxylink{struct_publisher}{Publisher} -\/\texorpdfstring{$>$}{>} \doxylink{struct_topic}{Topic} -\/\texorpdfstring{$>$}{>} \doxylink{struct_subscriber}{Subscriber} 관계 수  \\
+\end{DoxyTable}
+\hypertarget{md_docs_206__complexity__analysis_autotoc_md63}{}\doxysection{\texorpdfstring{2. 기능별 복잡도}{2. 기능별 복잡도}}\label{md_docs_206__complexity__analysis_autotoc_md63}
+
+\begin{DoxyTable}{5}{}{}{1}
+\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}기능  &\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}사용 자료구조  &\SetCell{r,bg=\tableheadbgcolor,font=\bfseries}시간복잡도  &\SetCell{r,bg=\tableheadbgcolor,font=\bfseries}공간복잡도  &\SetCell{c,bg=\tableheadbgcolor,font=\bfseries}설명  \\
+\doxylink{struct_node}{Node} 등록  &단일 연결 리스트  &\SetCell{r}O(\+N)  &\SetCell{r}O(1)  &중복 \doxylink{struct_node}{Node} 탐색 후 head에 삽입  \\
+\doxylink{struct_topic}{Topic} 등록  &단일 연결 리스트  &\SetCell{r}O(\+T)  &\SetCell{r}O(1)  &중복 \doxylink{struct_topic}{Topic} 탐색 후 head에 삽입  \\
+\doxylink{struct_node}{Node} 검색  &단일 연결 리스트  &\SetCell{r}O(\+N)  &\SetCell{r}O(1)  &이름이 같은 Node를 순차 탐색  \\
+\doxylink{struct_topic}{Topic} 검색  &단일 연결 리스트  &\SetCell{r}O(\+T)  &\SetCell{r}O(1)  &이름이 같은 Topic을 순차 탐색  \\
+\doxylink{struct_publisher}{Publisher} 등록  &연결 리스트  &\SetCell{r}O(N + T + P)  &\SetCell{r}O(1)  &\doxylink{struct_node}{Node}, \doxylink{struct_topic}{Topic}, 중복 \doxylink{struct_publisher}{Publisher} 확인 후 삽입  \\
+\doxylink{struct_subscriber}{Subscriber} 등록  &연결 리스트  &\SetCell{r}O(N + T + S)  &\SetCell{r}O(1)  &\doxylink{struct_node}{Node}, \doxylink{struct_topic}{Topic}, 중복 \doxylink{struct_subscriber}{Subscriber} 확인 후 삽입  \\
+\doxylink{struct_message}{Message} Publish  &priority queue, 연결 리스트  &\SetCell{r}O(N + T + P + M)  &\SetCell{r}O(1)  &\doxylink{struct_publisher}{Publisher} 검증 후 priority 기준 정렬 삽입  \\
+\doxylink{struct_message}{Message} Receive  &priority queue, 연결 리스트  &\SetCell{r}O(N + T + S)  &\SetCell{r}O(1)  &\doxylink{struct_subscriber}{Subscriber} 검증 후 queue front 제거  \\
+Priority Queue 삽입  &정렬 연결 리스트  &\SetCell{r}O(\+M)  &\SetCell{r}O(1)  &priority가 높은 Message가 앞에 오도록 삽입  \\
+Priority Queue 제거  &정렬 연결 리스트  &\SetCell{r}O(1)  &\SetCell{r}O(1)  &이미 정렬된 queue의 front를 제거  \\
+Communication Graph 출력  &\doxylink{struct_topic}{Topic}, \doxylink{struct_publisher}{Publisher}, \doxylink{struct_subscriber}{Subscriber} 리스트  &\SetCell{r}O(T + P\+\_\+total + S\+\_\+total)  &\SetCell{r}O(1)  &모든 \doxylink{struct_topic}{Topic} 관계를 간선 형태로 출력  \\
+BFS Path Search  &Queue, 배열, 연결 리스트 순회  &\SetCell{r}O(V \texorpdfstring{$\ast$}{*} (T + S\+\_\+total))  &\SetCell{r}O(\+V)  &Node를 BFS queue에 넣고 \doxylink{struct_topic}{Topic} 관계를 순회하며 인접 \doxylink{struct_node}{Node} 탐색  \\
+\doxylink{struct_simulator}{Simulator} Destroy  &연결 리스트 순회  &\SetCell{r}O(N + T + P\+\_\+total + S\+\_\+total + M\+\_\+total)  &\SetCell{r}O(1)  &동적 할당된 \doxylink{struct_node}{Node}, \doxylink{struct_topic}{Topic}, \doxylink{struct_message}{Message}, \doxylink{struct_publisher}{Publisher}, \doxylink{struct_subscriber}{Subscriber} 해제  \\
+\end{DoxyTable}
+\hypertarget{md_docs_206__complexity__analysis_autotoc_md64}{}\doxysection{\texorpdfstring{3. 분석 요약}{3. 분석 요약}}\label{md_docs_206__complexity__analysis_autotoc_md64}
+이 프로젝트는 자료구조 수업 최종 프로젝트에 맞게 배열보다 연결 리스트 중심으로 구현했다. \doxylink{struct_node}{Node}, \doxylink{struct_topic}{Topic}, \doxylink{struct_publisher}{Publisher}, Subscriber는 실행 중 동적으로 추가되므로 head 삽입이 쉬운 단일 연결 리스트를 사용한다.
+
+\doxylink{struct_message}{Message} Queue는 FR-\/08 이후 priority queue로 동작한다. 새 메시지를 발행할 때 priority 기준으로 정렬 삽입하므로 삽입은 O(\+M), 수신은 queue front를 제거하므로 O(1)이다. priority 값이 같은 메시지는 기존 발행 순서를 유지한다.
+
+Communication Graph는 별도 그래프 구조체를 중복 저장하지 않고, Topic이 가진 Publisher/\+Subscriber 리스트를 그래프의 간선 정보처럼 사용한다. BFS 경로 탐색도 이 관계를 직접 순회하여 수행한다. 이 방식은 구현이 단순하고 메모리 사용이 적지만, BFS 중 매 Node마다 \doxylink{struct_topic}{Topic} 관계를 다시 훑기 때문에 인접 리스트를 별도로 구성한 일반적인 BFS의 O(V + E)보다 비효율적일 수 있다. 
