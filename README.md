@@ -77,6 +77,33 @@ docs/
 - `simulator_graph.c`
   - list/graph/path formatting and BFS path search
 
+## Data structure design diagram
+
+```text
+Simulator
+|
++-- nodes ------------------------------------> singly linked list of Node
+|                                                [Node] -> [Node] -> ...
+|
++-- topics -----------------------------------> singly linked list of Topic
+                                                 [Topic] -> [Topic] -> ...
+                                                    |
+                                                    +-- publishers -------> singly linked list of Publisher
+                                                    |                        [Publisher] -> ...
+                                                    |
+                                                    +-- subscribers ------> singly linked list of Subscriber
+                                                    |                        [Subscriber] -> ...
+                                                    |
+                                                    +-- message_head -----> priority-ordered Message queue
+                                                    |                        [Message] -> [Message] -> ...
+                                                    |
+                                                    +-- message_tail -----> rear pointer of the same queue
+```
+
+Each `Topic` acts as a hub that owns three internal structures:
+publisher list, subscriber list, and message queue. This is why the project
+works well as a nested data structure example rather than a single flat list.
+
 ## Build and run
 
 On Windows PowerShell with MinGW:
@@ -158,6 +185,55 @@ Communication graph:
 Path search:
   Path found: lidar_node -> /scan -> nav_node -> /cmd_vel -> motor_node
 ```
+
+Expected in-memory structure after the example scenario:
+
+```text
+Simulator sim
+|
++-- nodes
+|     |
+|     v
+|   [motor_node] -> [nav_node] -> [lidar_node] -> NULL
+|
++-- topics
+      |
+      v
+    [/cmd_vel] -> [/scan] -> NULL
+       |            |
+       |            +-- publishers
+       |            |     |
+       |            |     v
+       |            |   [node_name: lidar_node] -> NULL
+       |            |
+       |            +-- subscribers
+       |            |     |
+       |            |     v
+       |            |   [node_name: nav_node] -> NULL
+       |            |
+       |            +-- messages
+       |                  |
+       |                  v
+       |               [normal data | priority 1] -> NULL
+       |
+       +-- publishers
+       |     |
+       |     v
+       |   [node_name: nav_node] -> NULL
+       |
+       +-- subscribers
+       |     |
+       |     v
+       |   [node_name: motor_node] -> NULL
+       |
+       +-- messages
+             |
+             v
+           NULL
+```
+
+The `/scan` queue contains only `normal data` at this point because
+`emergency data` was already dequeued by the `receive nav_node /scan` command.
 
 ## Notes
 
